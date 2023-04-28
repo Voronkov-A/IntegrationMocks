@@ -1,0 +1,23 @@
+{
+  "runtime": "Net70",
+  "documentGenerator": {
+    "fromDocument": {
+      "url": "../../Contracts/Locations.WebApi.yaml"
+    }
+  },
+  "codeGenerators": {
+    "openApiToCSharpController": {
+      "namespace": "IntegrationMocks.Sample.Locations.Adapters.WebApi",
+      "output": "Locations.WebApi.cs",
+      "controllerBaseClass": "Microsoft.AspNetCore.Mvc.Controller",
+      "controllerStyle": "Abstract",
+      "useActionResultType": true,
+      "useCancellationToken": true,
+      "responseArrayType": "System.Collections.Generic.IReadOnlyList",
+      "arrayBaseType": "System.Collections.Generic.List",
+      "jsonLibrary": "SystemTextJson",
+      "excludedTypeNames": [],
+      "additionalNamespaceUsages": []
+    }
+  }
+}

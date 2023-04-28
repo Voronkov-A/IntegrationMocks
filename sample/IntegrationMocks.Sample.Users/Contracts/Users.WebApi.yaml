@@ -1,0 +1,127 @@
+---
+openapi: 3.0.0
+info:
+  title: Users
+  version: 1.0.0
+paths:
+
+  /api/users:
+    post:
+      description: Create user.
+      operationId: Users_Create
+      requestBody:
+        description: User data.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        default:
+          $ref: '#/components/responses/DefaultErrorResponse'
+
+  /api/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: User identifier.
+        schema:
+          type: string
+          format: uuid
+    get:
+      description: Get user.
+      operationId: Users_Get
+      responses:
+        '200':
+          description: User.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserView'
+        '400':
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        default:
+          $ref: '#/components/responses/DefaultErrorResponse'
+
+components:
+  responses:
+
+    BadRequestErrorResponse:
+      description: Validation errors occurred.
+      content:
+        application/json:
+          schema: {}
+
+    NotFoundErrorResponse:
+      description: Resource not found.
+      content:
+        application/json:
+          schema: {}
+
+    DefaultErrorResponse:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema: {}
+
+  schemas:
+
+    CreateUserRequest:
+      description: Create user request.
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - locationId
+      properties:
+        name:
+          description: User name.
+          type: string
+        locationId:
+          description: User location id.
+          type: string
+          format: uuid
+
+    CreateUserResponse:
+      description: Create user response.
+      type: object
+      additionalProperties: false
+      required:
+        - id
+      properties:
+        id:
+          description: User identifier.
+          type: string
+          format: uuid
+
+    UserView:
+      description: User view.
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - locationId
+      properties:
+        id:
+          description: User identifier.
+          type: string
+          format: uuid
+        name:
+          description: User name.
+          type: string
+        locationId:
+          description: User location id.
+          type: string
+          format: uuid

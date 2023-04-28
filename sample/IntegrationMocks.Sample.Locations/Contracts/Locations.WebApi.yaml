@@ -1,0 +1,117 @@
+---
+openapi: 3.0.0
+info:
+  title: Locations
+  version: 1.0.0
+paths:
+
+  /api/locations:
+    post:
+      description: Create location.
+      operationId: Locations_Create
+      requestBody:
+        description: Location data.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocationRequest'
+      responses:
+        '201':
+          description: Location created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLocationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        default:
+          $ref: '#/components/responses/DefaultErrorResponse'
+
+  /api/locations/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Location identifier.
+        schema:
+          type: string
+          format: uuid
+    get:
+      description: Get location.
+      operationId: Locations_Get
+      responses:
+        '200':
+          description: Location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationView'
+        '400':
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        default:
+          $ref: '#/components/responses/DefaultErrorResponse'
+
+components:
+  responses:
+
+    BadRequestErrorResponse:
+      description: Validation errors occurred.
+      content:
+        application/json:
+          schema: {}
+
+    NotFoundErrorResponse:
+      description: Resource not found.
+      content:
+        application/json:
+          schema: {}
+
+    DefaultErrorResponse:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema: {}
+
+  schemas:
+
+    CreateLocationRequest:
+      description: Create location request.
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          description: Location name.
+          type: string
+
+    CreateLocationResponse:
+      description: Create location response.
+      type: object
+      additionalProperties: false
+      required:
+        - id
+      properties:
+        id:
+          description: Location identifier.
+          type: string
+          format: uuid
+
+    LocationView:
+      description: Location view.
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+      properties:
+        id:
+          description: Location identifier.
+          type: string
+          format: uuid
+        name:
+          description: Location name.
+          type: string
