@@ -1,6 +1,7 @@
 name: Publish
 on:
   workflow_dispatch:
+    inputs:
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,8 +16,9 @@ jobs:
       - name: Build
         run: dotnet build -c Release IntegrationMocks.nuget.slnf
       - name: Pack
-        run: export branch_name=${GITHUB_REF#refs/heads/}
-        run: [[ "$branch_name" =~ ^release\/[0-9]+$ ]] && export version_suffix=$branch_name
-        run: dotnet pack -c Release --version-suffix qwe /p:PackageVersion=$(cat VERSION) IntegrationMocks.nuget.slnf
+        run: |
+          export branch_name=${GITHUB_REF#refs/heads/}
+          [[ "$branch_name" =~ ^release\/[0-9]+$ ]] && export version_suffix=$branch_name
+          dotnet pack -c Release --version-suffix qwe /p:PackageVersion=$(cat VERSION) IntegrationMocks.nuget.slnf
       - name: Upload nuget
         run: dotnet nuget push src/**/*.nupkg
