@@ -11,11 +11,15 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>IntegrationMocks.Cleaner</ToolCommandName>
         <Description>IntegrationMocks cleaning global tool.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" />
     </ItemGroup>
 </Project>

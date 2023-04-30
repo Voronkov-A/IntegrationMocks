@@ -6,8 +6,12 @@
         <EnableDefaultContentItems>false</EnableDefaultContentItems>
         <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
         <Description>IntegrationMocks typical service classes.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" />
     </ItemGroup>
 </Project>
