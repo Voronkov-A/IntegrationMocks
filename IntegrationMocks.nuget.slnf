@@ -2,7 +2,10 @@
   "solution": {
     "path": "IntegrationMocks.sln",
     "projects": [
-      "src\\IntegrationMocks.Core\\IntegrationMocks.Core.csproj"
+      "src\\IntegrationMocks.Cleaner\\IntegrationMocks.Cleaner.csproj",
+      "src\\IntegrationMocks.Core\\IntegrationMocks.Core.csproj",
+      "src\\IntegrationMocks.Library\\IntegrationMocks.Library.csproj",
+      "src\\IntegrationMocks.Web\\IntegrationMocks.Web.csproj"
     ]
   }
 }

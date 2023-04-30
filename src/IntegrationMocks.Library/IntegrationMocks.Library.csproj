@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <EnableDefaultContentItems>false</EnableDefaultContentItems>
         <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
+        <Description>IntegrationMocks typical service classes.</Description>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
