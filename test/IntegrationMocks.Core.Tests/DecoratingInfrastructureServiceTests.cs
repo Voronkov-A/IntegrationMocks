@@ -20,12 +20,6 @@ public sealed class DecoratingInfrastructureServiceTests : IDisposable
     }
 
     [Fact]
-    public void Smoke()
-    {
-        Assert.True(false);
-    }
-
-    [Fact]
     public void Contract_delegates_to_inner()
     {
         var actualContract = _sut.Contract;

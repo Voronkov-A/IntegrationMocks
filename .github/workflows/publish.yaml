@@ -1,0 +1,22 @@
+name: Publish
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Build
+        run: dotnet build -c Release IntegrationMocks.nuget.slnf
+      - name: Pack
+        run: export branch_name=${GITHUB_REF#refs/heads/}
+        run: [[ "$branch_name" =~ ^release\/[0-9]+$ ]] && export version_suffix=$branch_name
+        run: dotnet pack -c Release --version-suffix qwe /p:PackageVersion=$(cat VERSION) IntegrationMocks.nuget.slnf
+      - name: Upload nuget
+        run: dotnet nuget push src/**/*.nupkg

@@ -1,0 +1,8 @@
+{
+  "solution": {
+    "path": "IntegrationMocks.sln",
+    "projects": [
+      "src\\IntegrationMocks.Core\\IntegrationMocks.Core.csproj"
+    ]
+  }
+}
