@@ -1,5 +1,6 @@
 using IntegrationMocks.Core;
 using IntegrationMocks.Core.Environments;
+using IntegrationMocks.Core.FluentDocker;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Library.Sql;
 using IntegrationMocks.Sample.Users.Adapters.Persistence;
@@ -17,7 +18,8 @@ public sealed class UsersPostgresFixture : IAsyncLifetime, IDisposable
         Postgres = new BindingInfrastructureService<SqlServiceContract>(
             "GITLAB_CI",
             ServiceBinding.Create("true", () => new EnvironmentSqlService()),
-            ServiceBinding.Create(() => new DockerPostgresService()));
+            ServiceBinding.Create(() => new DockerPostgresService(new FluentDockerContainerManager(
+                LoggerFixture.CreateLogger<FluentDockerContainerManager>()))));
         _persistenceConnectionString = Postgres.CreatePostgresConnectionString(
             RandomName.PrefixPidGuid(nameof(UsersPostgresFixture)));
     }

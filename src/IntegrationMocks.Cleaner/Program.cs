@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
+using IntegrationMocks.Core.Docker;
 using IntegrationMocks.Core.FluentDocker;
 using IntegrationMocks.Core.Networking;
 

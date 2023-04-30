@@ -1,6 +1,8 @@
+using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Web.Hosting;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 
 namespace IntegrationMocks.Web.Mocks;
 
@@ -8,10 +10,15 @@ public abstract class DefaultMockService<TContract> : WebApplicationService<TCon
 {
     private readonly List<IControllerRegistrar> _controllerRegistrars;
 
-    protected DefaultMockService(IPortManager portManager)
+    protected DefaultMockService(IPortManager portManager, Range<int> portRange)
     {
         WebApiPort = portManager.TakePort();
         _controllerRegistrars = new List<IControllerRegistrar>();
+    }
+
+    protected DefaultMockService(IPortManager portManager)
+        : this(portManager, PortRange.Default)
+    {
     }
 
     protected IPort WebApiPort { get; }
@@ -24,7 +31,7 @@ public abstract class DefaultMockService<TContract> : WebApplicationService<TCon
     protected override WebApplicationBuilder CreateWebApplicationBuilder()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Configuration["Kestrel:EndPoints:Http:Url"] = $"http://+:{WebApiPort.Number}";
+        builder.WebHost.UseKestrel(opt => opt.ListenAnyIP(WebApiPort.Number));
         builder.Services.AddExplicitControllers(_controllerRegistrars);
         return builder;
     }

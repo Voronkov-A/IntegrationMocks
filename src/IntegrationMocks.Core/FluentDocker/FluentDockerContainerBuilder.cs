@@ -6,11 +6,15 @@ namespace IntegrationMocks.Core.FluentDocker;
 public class FluentDockerContainerBuilder : IDockerContainerBuilder
 {
     private readonly ContainerBuilder _builder;
+    private readonly HashSet<int> _externalPorts;
 
     public FluentDockerContainerBuilder(ContainerBuilder builder)
     {
         _builder = builder;
+        _externalPorts = new HashSet<int>();
     }
+
+    public IReadOnlyCollection<int> ExternalPorts => _externalPorts;
 
     public IDockerContainerBuilder UseImage(string image)
     {
@@ -27,6 +31,7 @@ public class FluentDockerContainerBuilder : IDockerContainerBuilder
     public IDockerContainerBuilder ExposePort(int hostPort, int containerPort)
     {
         _builder.ExposePort(hostPort, containerPort);
+        _externalPorts.Add(hostPort);
         return this;
     }
 

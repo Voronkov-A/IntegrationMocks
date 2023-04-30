@@ -29,6 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{1570E7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationMocks.Cleaner", "src\IntegrationMocks.Cleaner\IntegrationMocks.Cleaner.csproj", "{D9822F06-B030-48D0-B654-33078C3F47AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationMocks.Library.Tests", "test\IntegrationMocks.Library.Tests\IntegrationMocks.Library.Tests.csproj", "{72FABC01-7A02-44E9-BD11-FFA488C536D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationMocks.Web.Tests", "test\IntegrationMocks.Web.Tests\IntegrationMocks.Web.Tests.csproj", "{3B451A2F-94D0-4BE9-8E9F-27D7A2E5208A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +82,14 @@ Global
 		{D9822F06-B030-48D0-B654-33078C3F47AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9822F06-B030-48D0-B654-33078C3F47AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9822F06-B030-48D0-B654-33078C3F47AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72FABC01-7A02-44E9-BD11-FFA488C536D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72FABC01-7A02-44E9-BD11-FFA488C536D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72FABC01-7A02-44E9-BD11-FFA488C536D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72FABC01-7A02-44E9-BD11-FFA488C536D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B451A2F-94D0-4BE9-8E9F-27D7A2E5208A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B451A2F-94D0-4BE9-8E9F-27D7A2E5208A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B451A2F-94D0-4BE9-8E9F-27D7A2E5208A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B451A2F-94D0-4BE9-8E9F-27D7A2E5208A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F9AEF002-DBA1-4B8D-9ACE-2EAC727AECC5} = {B73773FA-B186-4177-8C48-FBE9811F662D}
@@ -90,5 +102,7 @@ Global
 		{D374797E-8DE9-4142-AB77-BC7E13657333} = {1570E708-FB05-463A-8868-472DA73D018B}
 		{482F526A-748D-4136-A329-A710503D5C90} = {1570E708-FB05-463A-8868-472DA73D018B}
 		{D9822F06-B030-48D0-B654-33078C3F47AE} = {B73773FA-B186-4177-8C48-FBE9811F662D}
+		{72FABC01-7A02-44E9-BD11-FFA488C536D8} = {94F20A0E-A18F-4B95-A26F-0844D032B640}
+		{3B451A2F-94D0-4BE9-8E9F-27D7A2E5208A} = {94F20A0E-A18F-4B95-A26F-0844D032B640}
 	EndGlobalSection
 EndGlobal

@@ -11,42 +11,44 @@ public class PortManager : IPortManager
         $"{nameof(IntegrationMocks)}_{nameof(PortManager)}");
     public static readonly PortManager Default = new(
         new DirectoryStringRepository(DefaultPortNumberRepositoryDirectoryPath),
-        new PortMonitor(),
-        new Range<int>(33000, 34000));
+        new PortMonitor());
 
     private readonly IStringRepository _portNumberRepository;
     private readonly IPortMonitor _portMonitor;
-    private readonly Range<int> _portRange;
 
-    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor, Range<int> portRange)
+    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor)
     {
         _portNumberRepository = portNumberRepository;
         _portMonitor = portMonitor;
-        _portRange = portRange;
     }
 
-    public IPort TakePort()
+    public IPort TakePort(Range<int> portNumberRange)
     {
-        return new PortHandle(this);
+        if (portNumberRange.Min <= 0)
+        {
+            throw new ArgumentException($"Port number {portNumberRange.Min} is negative.", nameof(portNumberRange));
+        }
+
+        return new PortHandle(this, ref portNumberRange);
     }
 
-    public void DeleteAllPorts()
+    public void DeleteAllPorts(Func<int, bool> portNumberPredicate)
     {
-        foreach (var portNumber in _portNumberRepository.GetAll())
+        foreach (var portNumber in _portNumberRepository.GetAll().Where(x => portNumberPredicate(int.Parse(x))))
         {
             _portNumberRepository.Remove(portNumber);
         }
     }
 
-    private int CreatePortNumber()
+    private int CreatePortNumber(ref Range<int> portNumberRange)
     {
         var usedPorts = _portNumberRepository
             .GetAll()
             .Select(int.Parse)
-            .Concat(_portMonitor.GetUsedPorts(_portRange))
+            .Concat(_portMonitor.GetUsedPorts(portNumberRange))
             .ToHashSet();
 
-        for (var port = _portRange.Min; port <= _portRange.Max; ++port)
+        for (var port = portNumberRange.Min; port <= portNumberRange.Max; ++port)
         {
             if (!usedPorts.Contains(port) && _portNumberRepository.Add(port.ToString()))
             {
@@ -54,7 +56,7 @@ public class PortManager : IPortManager
             }
         }
 
-        throw new InvalidOperationException($"Could not find free port within {_portRange}.");
+        throw new InvalidOperationException($"Could not find free port within {portNumberRange}.");
     }
 
     private void DeletePortNumber(int port)
@@ -67,13 +69,13 @@ public class PortManager : IPortManager
         private readonly PortManager _manager;
         private readonly EventHandler _processExitHook;
 
-        public PortHandle(PortManager manager) : base(IntPtr.Zero, true)
+        public PortHandle(PortManager manager, ref Range<int> portNumberRange) : base(IntPtr.Zero, true)
         {
             _processExitHook = WeakDisposeEventHandler.Create(this);
             AppDomain.CurrentDomain.ProcessExit += _processExitHook;
 
             _manager = manager;
-            Number = _manager.CreatePortNumber();
+            Number = _manager.CreatePortNumber(ref portNumberRange);
         }
 
         public int Number { get; }

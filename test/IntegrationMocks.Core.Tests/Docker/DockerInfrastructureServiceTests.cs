@@ -1,4 +1,5 @@
 using IntegrationMocks.Core.Docker;
+using IntegrationMocks.Core.Resources;
 using Moq;
 using Xunit;
 
@@ -15,7 +16,10 @@ public class DockerInfrastructureServiceTests
         _dockerContainerManagerMock = new Mock<IDockerContainerManager>();
         _container = Mock.Of<IDockerContainer>();
         _dockerContainerManagerMock
-            .Setup(x => x.StartContainer(It.IsAny<Action<IDockerContainerBuilder>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.StartContainer(
+                It.IsAny<INameGenerator>(),
+                It.IsAny<Action<IDockerContainerBuilder>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(_container);
         _sut = new TestDockerInfrastructureService(_dockerContainerManagerMock.Object);
     }
@@ -26,7 +30,10 @@ public class DockerInfrastructureServiceTests
         await _sut.InitializeAsync();
 
         _dockerContainerManagerMock.Verify(
-            x => x.StartContainer(_sut.ConfigureContainerAction, It.IsAny<CancellationToken>()),
+            x => x.StartContainer(
+                It.IsAny<INameGenerator>(),
+                _sut.ConfigureContainerAction,
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -46,13 +53,17 @@ public class DockerInfrastructureServiceTests
         await _sut.InitializeAsync();
 
         _dockerContainerManagerMock.Verify(
-            x => x.StartContainer(_sut.ConfigureContainerAction, It.IsAny<CancellationToken>()),
+            x => x.StartContainer(
+                It.IsAny<INameGenerator>(),
+                _sut.ConfigureContainerAction,
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     private class TestDockerInfrastructureService : DockerInfrastructureService<object>
     {
-        public TestDockerInfrastructureService(IDockerContainerManager containerManager) : base(containerManager)
+        public TestDockerInfrastructureService(IDockerContainerManager containerManager)
+            : base(containerManager, new RandomNameGenerator(nameof(TestDockerInfrastructureService)))
         {
             Contract = new object();
         }

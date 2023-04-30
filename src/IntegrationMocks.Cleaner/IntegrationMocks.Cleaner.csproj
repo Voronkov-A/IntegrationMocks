@@ -7,6 +7,9 @@
         <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
         <OutputType>Exe</OutputType>
         <NoWarn>NU5104</NoWarn>
+        <AssemblyName>IntegrationMocks.Cleaner</AssemblyName>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>IntegrationMocks.Cleaner</ToolCommandName>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />

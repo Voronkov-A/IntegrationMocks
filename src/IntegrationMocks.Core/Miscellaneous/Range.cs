@@ -1,6 +1,6 @@
 namespace IntegrationMocks.Core.Miscellaneous;
 
-public class Range<T> where T : IComparable<T>, IEquatable<T>
+public readonly struct Range<T> where T : IComparable<T>, IEquatable<T>
 {
     public Range(T min, T max)
     {
@@ -11,6 +11,10 @@ public class Range<T> where T : IComparable<T>, IEquatable<T>
 
         Min = min;
         Max = max;
+    }
+
+    public Range(T minAndMax) : this(minAndMax, minAndMax)
+    {
     }
 
     public T Min { get; }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Ductus.FluentDocker.Extensions;
+using Ductus.FluentDocker.Services.Extensions;
 using IntegrationMocks.Core.Docker;
 using IntegrationMocks.Core.Execution;
 using IntegrationMocks.Core.Miscellaneous;
@@ -31,6 +32,15 @@ public sealed class FluentDockerContainer : IDockerContainer
 
             return state.ToServiceState().ToDockerContainerState();
         }
+    }
+
+    public List<ProcessDescriptor> GetAllProcesses()
+    {
+        return _handle.ContainerService
+            .GetRunningProcesses()
+            .Rows
+            .Select(x => new ProcessDescriptor(x.Pid, x.Command))
+            .ToList();
     }
 
     public Process StartProcess(ProcessStartOptions options)

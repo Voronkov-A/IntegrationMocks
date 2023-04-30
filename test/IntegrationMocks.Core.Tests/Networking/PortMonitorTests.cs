@@ -2,13 +2,14 @@ using System.Net;
 using System.Net.Sockets;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Networking;
+using IntegrationMocks.Core.Tests.Fixtures;
 using Xunit;
 
 namespace IntegrationMocks.Core.Tests.Networking;
 
 public class PortMonitorTests
 {
-    private const int Port = 34242;
+    private const int Port = UniquePorts.PortMonitorTests;
 
     private readonly PortMonitor _sut;
 

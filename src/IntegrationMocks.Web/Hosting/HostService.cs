@@ -33,11 +33,20 @@ public abstract class HostService<TContract> : IInfrastructureService<TContract>
 
         if (_host != null)
         {
-            throw new InvalidOperationException("The service has already been started.");
+            return;
         }
 
-        _host = CreateHostBuilder().Build();
-        await _host.StartAsync(cancellationToken);
+        try
+        {
+            _host = CreateHostBuilder().Build();
+            await _host.StartAsync(cancellationToken);
+        }
+        catch when (_host != null)
+        {
+            _host.Dispose();
+            _host = null;
+            throw;
+        }
     }
 
     protected abstract IHostBuilder CreateHostBuilder();

@@ -4,6 +4,7 @@ using IntegrationMocks.Core.Execution;
 using IntegrationMocks.Core.FluentDocker;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Networking;
+using IntegrationMocks.Core.Resources;
 
 namespace IntegrationMocks.Library.Sql;
 
@@ -17,11 +18,13 @@ public class DockerPostgresService : DockerInfrastructureService<SqlServiceContr
     public DockerPostgresService(
         IDockerContainerManager containerManager,
         IPortManager portManager,
+        INameGenerator nameGenerator,
+        Range<int> portRange,
         DockerPostgresServiceOptions options)
-        : base(containerManager)
+        : base(containerManager, nameGenerator)
     {
         _image = options.Image;
-        _port = portManager.TakePort();
+        _port = portManager.TakePort(portRange);
         Contract = new SqlServiceContract(
             options.Username,
             options.Password,
@@ -29,8 +32,36 @@ public class DockerPostgresService : DockerInfrastructureService<SqlServiceContr
             _port.Number);
     }
 
+    public DockerPostgresService(
+        IDockerContainerManager containerManager,
+        IPortManager portManager,
+        DockerPostgresServiceOptions options)
+        : this(
+            containerManager,
+            portManager,
+            new RandomNameGenerator(nameof(DockerPostgresService)),
+            PortRange.Default,
+            options)
+    {
+    }
+
     public DockerPostgresService(DockerPostgresServiceOptions options)
-        : this(FluentDockerContainerManager.Default, PortManager.Default, options)
+        : this(
+            FluentDockerContainerManager.Default,
+            PortManager.Default,
+            new RandomNameGenerator(nameof(DockerPostgresService)),
+            PortRange.Default,
+            options)
+    {
+    }
+
+    public DockerPostgresService(IDockerContainerManager containerManager)
+        : this(
+            containerManager,
+            PortManager.Default,
+            new RandomNameGenerator(nameof(DockerPostgresService)),
+            PortRange.Default,
+            new DockerPostgresServiceOptions())
     {
     }
 
@@ -51,6 +82,9 @@ public class DockerPostgresService : DockerInfrastructureService<SqlServiceContr
     protected override async Task WaitUntilReady(IDockerContainer container, CancellationToken cancellationToken)
     {
         await TimeService.Instance.WaitUntil(() => container.State == DockerContainerState.Running, cancellationToken);
+        await TimeService.Instance.WaitUntil(
+            () => container.GetAllProcesses().Any(x => x.Command == "postgres"),
+            cancellationToken);
         await TimeService.Instance.WaitUntil(
             async () =>
                 (await container.Execute("pg_isready", new[] { "-U", Contract.Username }, cancellationToken))

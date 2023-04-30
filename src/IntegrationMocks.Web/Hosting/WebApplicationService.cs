@@ -34,17 +34,26 @@ public abstract class WebApplicationService<TContract> : IInfrastructureService<
 
         if (_webApplication != null)
         {
-            throw new InvalidOperationException("The service has already been started.");
+            return;
         }
 
-        _webApplication = CreateWebApplicationBuilder().Build();
-        Configure(_webApplication);
-        await _webApplication.StartAsync(cancellationToken);
+        try
+        {
+            _webApplication = CreateWebApplicationBuilder().Build();
+            Configure(_webApplication);
+            await _webApplication.StartAsync(cancellationToken);
+        }
+        catch when (_webApplication != null)
+        {
+            await _webApplication.DisposeAsync();
+            _webApplication = null;
+            throw;
+        }
     }
 
     protected abstract WebApplicationBuilder CreateWebApplicationBuilder();
 
-    protected abstract void Configure(WebApplication application);
+    protected abstract void Configure(WebApplication app);
 
     protected virtual async ValueTask DisposeAsync(bool disposing)
     {

@@ -1,8 +1,10 @@
+using IntegrationMocks.Core.Miscellaneous;
+
 namespace IntegrationMocks.Core.Networking;
 
 public interface IPortManager
 {
-    IPort TakePort();
+    IPort TakePort(Range<int> portNumberRange);
 
-    void DeleteAllPorts();
+    void DeleteAllPorts(Func<int, bool> portNumberPredicate);
 }

@@ -6,6 +6,8 @@ using Ductus.FluentDocker.Services;
 using IntegrationMocks.Core.Docker;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Resources;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace IntegrationMocks.Core.FluentDocker;
 
@@ -16,25 +18,44 @@ public class FluentDockerContainerManager : IDockerContainerManager
         $"{nameof(IntegrationMocks)}_{nameof(FluentDockerContainerManager)}");
 
     public static readonly FluentDockerContainerManager Default = new(
-        new RandomNameGenerator($"{nameof(IntegrationMocks)}_{nameof(FluentDockerContainerManager)}"),
-        new DirectoryStringRepository(DefaultContainerNameRepositoryDirectoryPath));
+        new DirectoryStringRepository(DefaultContainerNameRepositoryDirectoryPath),
+        NullLogger<FluentDockerContainerManager>.Instance);
 
-    private readonly INameGenerator _containerNameGenerator;
     private readonly IStringRepository _containerNameRepository;
+    private readonly ILogger<FluentDockerContainerManager> _logger;
 
     public FluentDockerContainerManager(
-        INameGenerator containerNameGenerator,
-        IStringRepository containerNameRepository)
+        IStringRepository containerNameRepository,
+        ILogger<FluentDockerContainerManager> logger)
     {
-        _containerNameGenerator = containerNameGenerator;
         _containerNameRepository = containerNameRepository;
+        _logger = logger;
+    }
+
+    public FluentDockerContainerManager(IStringRepository containerNameRepository)
+        : this(containerNameRepository, NullLogger<FluentDockerContainerManager>.Instance)
+    {
+    }
+
+    public FluentDockerContainerManager(ILogger<FluentDockerContainerManager> logger)
+        : this(new DirectoryStringRepository(DefaultContainerNameRepositoryDirectoryPath), logger)
+    {
+    }
+
+    public FluentDockerContainerManager()
+        : this(
+            new DirectoryStringRepository(DefaultContainerNameRepositoryDirectoryPath),
+            NullLogger<FluentDockerContainerManager>.Instance)
+    {
     }
 
     public ValueTask<IDockerContainer> StartContainer(
+        INameGenerator containerNameGenerator,
         Action<IDockerContainerBuilder> configure,
         CancellationToken cancellationToken)
     {
-        IDockerContainer container = new FluentDockerContainer(new DockerContainerHandle(this, configure));
+        IDockerContainer container = new FluentDockerContainer(
+            new DockerContainerHandle(this, containerNameGenerator, configure, _logger));
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -45,7 +66,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
         return ValueTask.FromResult(container);
     }
 
-    public ValueTask DeleteAllContainers(CancellationToken cancellationToken)
+    public ValueTask DeleteAllContainers(Func<string, bool> containerNamePredicate, CancellationToken cancellationToken)
     {
         var usedContainerNames = _containerNameRepository.GetAll();
 
@@ -57,13 +78,13 @@ public class FluentDockerContainerManager : IDockerContainerManager
             throw new SystemException("Could not connect to docker host.");
         }
 
-        foreach (var containerName in usedContainerNames)
+        foreach (var containerName in usedContainerNames.Where(containerNamePredicate))
         {
             var containers = docker.GetContainers(all: true, filters: $"name=^{Regex.Escape(containerName)}$");
 
             foreach (var container in containers)
             {
-                using (new DockerContainerHandle(this, containerName, container))
+                using (new DockerContainerHandle(this, containerName, container, _logger))
                 {
                 }
             }
@@ -72,15 +93,15 @@ public class FluentDockerContainerManager : IDockerContainerManager
         return ValueTask.CompletedTask;
     }
 
-    private string CreateContainerName()
+    private string CreateContainerName(INameGenerator containerNameGenerator)
     {
         var usedContainerNames = _containerNameRepository.GetAll();
-        var firstContainerName = _containerNameGenerator.GenerateName();
+        var firstContainerName = containerNameGenerator.GenerateName();
         var containerName = firstContainerName;
 
         while (usedContainerNames.Contains(containerName) || !_containerNameRepository.Add(containerName))
         {
-            containerName = _containerNameGenerator.GenerateName();
+            containerName = containerNameGenerator.GenerateName();
 
             if (containerName == firstContainerName)
             {
@@ -101,15 +122,21 @@ public class FluentDockerContainerManager : IDockerContainerManager
         private readonly FluentDockerContainerManager _manager;
         private readonly string _containerName;
         private readonly EventHandler _processExitHook;
+        private readonly ILogger _logger;
 
-        public DockerContainerHandle(FluentDockerContainerManager manager, Action<IDockerContainerBuilder> configure)
+        public DockerContainerHandle(
+            FluentDockerContainerManager manager,
+            INameGenerator containerNameGenerator,
+            Action<IDockerContainerBuilder> configure,
+            ILogger logger)
             : base(IntPtr.Zero, true)
         {
             _processExitHook = WeakDisposeEventHandler.Create(this);
             AppDomain.CurrentDomain.ProcessExit += _processExitHook;
 
             _manager = manager;
-            _containerName = _manager.CreateContainerName();
+            _containerName = _manager.CreateContainerName(containerNameGenerator);
+            _logger = logger;
 
             var builder = new Builder().UseContainer();
             builder.RemoveVolumesOnDispose(true);
@@ -117,13 +144,18 @@ public class FluentDockerContainerManager : IDockerContainerManager
             configure(containerBuilder);
             builder.WithName(_containerName);
             ContainerService = builder.Build();
+            _logger.LogDebug(
+                "Starting container {@containerName} with external ports {@externalPorts}.",
+                _containerName,
+                containerBuilder.ExternalPorts);
             ContainerService.Start();
         }
 
         public DockerContainerHandle(
             FluentDockerContainerManager manager,
             string containerName,
-            IContainerService containerService)
+            IContainerService containerService,
+            ILogger logger)
             : base(IntPtr.Zero, true)
         {
             _processExitHook = WeakDisposeEventHandler.Create(this);
@@ -132,6 +164,8 @@ public class FluentDockerContainerManager : IDockerContainerManager
             _manager = manager;
             _containerName = containerName;
             ContainerService = containerService;
+            _logger = logger;
+            _logger.LogDebug("Attaching to container {@containerName}.", _containerName);
         }
 
         public IContainerService ContainerService { get; }
@@ -146,6 +180,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
 
             if (_containerName != null)
             {
+                _logger.LogDebug("Deleting container {@containerName}.", _containerName);
                 _manager.DeleteContainerName(_containerName);
             }
 

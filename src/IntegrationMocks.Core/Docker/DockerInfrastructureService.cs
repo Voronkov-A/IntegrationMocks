@@ -1,16 +1,19 @@
 using IntegrationMocks.Core.Miscellaneous;
+using IntegrationMocks.Core.Resources;
 
 namespace IntegrationMocks.Core.Docker;
 
 public abstract class DockerInfrastructureService<TContract> : IInfrastructureService<TContract>
 {
     private readonly IDockerContainerManager _containerManager;
+    private readonly INameGenerator _nameGenerator;
     private IDockerContainer? _container;
     private int _disposed;
 
-    protected DockerInfrastructureService(IDockerContainerManager containerManager)
+    protected DockerInfrastructureService(IDockerContainerManager containerManager, INameGenerator nameGenerator)
     {
         _containerManager = containerManager;
+        _nameGenerator = nameGenerator;
     }
 
     public abstract TContract Contract { get; }
@@ -24,8 +27,17 @@ public abstract class DockerInfrastructureService<TContract> : IInfrastructureSe
             return;
         }
 
-        _container = await _containerManager.StartContainer(ConfigureContainer, cancellationToken);
-        await WaitUntilReady(_container, cancellationToken);
+        try
+        {
+            _container = await _containerManager.StartContainer(_nameGenerator, ConfigureContainer, cancellationToken);
+            await WaitUntilReady(_container, cancellationToken);
+        }
+        catch when (_container != null)
+        {
+            _container.Dispose();
+            _container = null;
+            throw;
+        }
     }
 
     public void Dispose()
