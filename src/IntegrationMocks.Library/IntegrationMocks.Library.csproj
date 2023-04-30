@@ -12,6 +12,6 @@
         <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None Include="README.md" Pack="true" />
+        <None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>
