@@ -6,6 +6,12 @@ Minimalistic set of simple helpers for writing integration and component tests. 
 * Mocking web API dependencies (i.e. service A interacts with service B - IntegrationMocks.Web helps to mock service B and use the mock in component tests of service A).
 * Running the service under test for component tests with overridden configuration.
 
+## Nuget
+* [IntegrationMocks.Cleaner](https://www.nuget.org/packages/IntegrationMocks.Cleaner/)
+* [IntegrationMocks.Core](https://www.nuget.org/packages/IntegrationMocks.Core/)
+* [IntegrationMocks.Library](https://www.nuget.org/packages/IntegrationMocks.Library/)
+* [IntegrationMocks.Web](https://www.nuget.org/packages/IntegrationMocks.Web/)
+
 ## Components
 * [IntegrationMocks.Cleaner](src/IntegrationMocks.Cleaner/README.md) - this tool may be used to clean up resources that were not released because of process termination.
 * [IntegrationMocks.Core](src/IntegrationMocks.Core/README.md) - core library that contains abstractions and a minimal docker wrapper.
