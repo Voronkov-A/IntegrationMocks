@@ -12,4 +12,9 @@ public class TimeService : ITimeService
     {
         await Task.Delay(delay, cancellationToken);
     }
+
+    public void Sleep(TimeSpan delay)
+    {
+        Thread.Sleep(delay);
+    }
 }

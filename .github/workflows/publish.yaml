@@ -15,6 +15,6 @@ jobs:
         run: |
           export branch_name=${GITHUB_REF#refs/heads/}
           ! [[ "$branch_name" =~ ^release\/[0-9]+(\.[0-9]+)?$ ]] && export version_suffix="-${branch_name//\//-}"
-          dotnet pack -c Release -p:PackageVersion=$(cat VERSION) -p:VersionSuffix="$version_suffix" -p:PackageProjectUrl="https://github.com/Voronkov-A/IntegrationMocks" -p:Authors="Voronkov-A" IntegrationMocks.nuget.slnf
+          dotnet pack -c Release -p:PackageVersion="$(cat VERSION)$version_suffix" -p:PackageProjectUrl="https://github.com/Voronkov-A/IntegrationMocks" -p:Authors="Voronkov-A" IntegrationMocks.nuget.slnf
       - name: Upload nuget
         run: dotnet nuget push --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json src/**/*.nupkg

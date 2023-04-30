@@ -27,6 +27,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         _containerNameRepository = new DirectoryStringRepository(
             FluentDockerContainerManager.DefaultContainerNameRepositoryDirectoryPath);
         _internalPort = fixture.Create<int>() % 100 + 30000;
+        WaitUntilPortFree();
         _externalPort = PortManager.Default.TakePort(new Range<int>(UniquePorts.FluentDockerContainerManagerTests));
         var hosts = new Hosts().Discover();
         _docker = hosts.FirstOrDefault(x => x.IsNative) ?? hosts.FirstOrDefault(x => x.Name == "default")
@@ -156,6 +157,15 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         {
             return false;
         }
+    }
+
+    private static void WaitUntilPortFree()
+    {
+        var portMonitor = new PortMonitor();
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+        TimeService.Instance.WaitUntil(
+            () => portMonitor.GetUsedPorts(new Range<int>(UniquePorts.FluentDockerContainerManagerTests)).Count == 0,
+            cancellation.Token);
     }
 
     private class NameGenerator : INameGenerator

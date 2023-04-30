@@ -81,11 +81,13 @@ public class DockerPostgresService : DockerInfrastructureService<SqlServiceContr
 
     protected override async Task WaitUntilReady(IDockerContainer container, CancellationToken cancellationToken)
     {
-        await TimeService.Instance.WaitUntil(() => container.State == DockerContainerState.Running, cancellationToken);
-        await TimeService.Instance.WaitUntil(
+        await TimeService.Instance.WaitUntilAsync(
+            () => container.State == DockerContainerState.Running,
+            cancellationToken);
+        await TimeService.Instance.WaitUntilAsync(
             () => container.GetAllProcesses().Any(x => x.Command == "postgres"),
             cancellationToken);
-        await TimeService.Instance.WaitUntil(
+        await TimeService.Instance.WaitUntilAsync(
             async () =>
                 (await container.Execute("pg_isready", new[] { "-U", Contract.Username }, cancellationToken))
                 .ExitCode == 0,
