@@ -49,6 +49,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
 
         Assert.True(Ping(_externalPort.Number));
         Assert.True(ContainerExists(nameGenerator.LastGeneratedName!));
+        _externalPort.Dispose();
     }
 
     [Fact]
@@ -60,6 +61,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         using var container = await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         Assert.Contains(nameGenerator.LastGeneratedName, _containerNameRepository.GetAll());
+        _externalPort.Dispose();
     }
 
     [Fact]
@@ -74,6 +76,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         Assert.False(Ping(_externalPort.Number));
         Assert.False(ContainerExists(nameGenerator.LastGeneratedName!));
         Assert.DoesNotContain(nameGenerator.LastGeneratedName, _containerNameRepository.GetAll());
+        _externalPort.Dispose();
     }
 
     [Fact]
@@ -89,6 +92,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         Assert.False(Ping(_externalPort.Number));
         Assert.False(ContainerExists(nameGenerator.LastGeneratedName!));
         Assert.DoesNotContain(nameGenerator.LastGeneratedName, _containerNameRepository.GetAll());
+        _externalPort.Dispose();
     }
 
     [Fact]
@@ -100,6 +104,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None));
+        _externalPort.Dispose();
     }
 
     [Fact]
@@ -114,6 +119,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         Assert.False(Ping(_externalPort.Number));
         Assert.False(ContainerExists(nameGenerator.LastGeneratedName!));
         Assert.DoesNotContain(nameGenerator.LastGeneratedName, _containerNameRepository.GetAll());
+        _externalPort.Dispose();
     }
 
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
