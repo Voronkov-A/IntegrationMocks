@@ -146,6 +146,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
                 _containerName,
                 containerBuilder.ExternalPorts);
             ContainerService.Start();
+            _manager._logger.LogDebug("Started container {@containerName}.", _containerName);
         }
 
         public DockerContainerHandle(
