@@ -48,7 +48,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     [Fact]
     public async Task StartContainer_can_start_busybox_container()
     {
-        var nameGenerator = new NameGenerator();
+        var nameGenerator = new NameGenerator(nameof(StartContainer_can_start_busybox_container));
 
         using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
@@ -59,7 +59,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     [Fact]
     public async Task StartContainer_marks_container_name_as_used_in_repository()
     {
-        var nameGenerator = new NameGenerator();
+        var nameGenerator = new NameGenerator(nameof(StartContainer_marks_container_name_as_used_in_repository));
 
         using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
@@ -69,7 +69,8 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     [Fact]
     public async Task StartContainer_creates_container_that_can_be_destroyed_with_dispose()
     {
-        var nameGenerator = new NameGenerator();
+        var nameGenerator = new NameGenerator(
+            nameof(StartContainer_creates_container_that_can_be_destroyed_with_dispose));
         using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         container.Dispose();
@@ -82,7 +83,8 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     [Fact]
     public async Task StartContainer_creates_container_that_can_be_destroyed_with_finalizer()
     {
-        var nameGenerator = new NameGenerator();
+        var nameGenerator = new NameGenerator(
+            nameof(StartContainer_creates_container_that_can_be_destroyed_with_finalizer));
 
         await CreateContainerAndForget(_sut, nameGenerator);
         GC.Collect(2);
@@ -96,7 +98,9 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     [Fact]
     public async Task StartContainer_throws_when_same_name_is_already_in_use()
     {
-        var nameGenerator = new NameGenerator(RandomName.PrefixGuid(nameof(FluentDockerContainerManagerTests)));
+        var nameGenerator = new NameGenerator(
+            nameof(StartContainer_throws_when_same_name_is_already_in_use),
+            RandomName.PrefixGuid(nameof(FluentDockerContainerManagerTests)));
         using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -106,7 +110,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     [Fact]
     public async Task DeleteAllContainers_destroys_containers()
     {
-        var nameGenerator = new NameGenerator();
+        var nameGenerator = new NameGenerator(nameof(DeleteAllContainers_destroys_containers));
         using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         await _sut.DeleteAllContainers(nameGenerator.Matches, CancellationToken.None);
@@ -161,7 +165,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     private static void WaitUntilPortFree()
     {
         var portMonitor = new PortMonitor();
-        using var cancellation = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMinutes(5));
         TimeService.Instance.WaitUntil(
             () => portMonitor.GetUsedPorts(new Range<int>(UniquePorts.FluentDockerContainerManagerTests)).Count == 0,
             cancellation.Token);
@@ -169,24 +173,26 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
 
     private class NameGenerator : INameGenerator
     {
-        private readonly string? _name;
+        private readonly string _prefix;
+        private readonly string? _id;
 
-        public NameGenerator(string? name = null)
+        public NameGenerator(string prefix, string? id = null)
         {
-            _name = name;
+            _prefix = prefix;
+            _id = id;
         }
 
         public string? LastGeneratedName { get; private set; }
 
         public string GenerateName()
         {
-            LastGeneratedName = _name ?? RandomName.PrefixGuid(nameof(FluentDockerContainerManagerTests));
+            LastGeneratedName = _id == null ? RandomName.PrefixGuid(_prefix) : $"{_prefix}_{_id}";
             return LastGeneratedName;
         }
 
         public bool Matches(string containerName)
         {
-            return containerName.StartsWith($"{nameof(FluentDockerContainerManagerTests)}_");
+            return containerName.StartsWith($"{_prefix}_");
         }
     }
 }
