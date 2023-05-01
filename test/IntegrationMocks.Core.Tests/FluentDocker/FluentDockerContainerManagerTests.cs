@@ -26,9 +26,10 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         var fixture = new Fixture();
         _containerNameRepository = new DirectoryStringRepository(
             FluentDockerContainerManager.DefaultContainerNameRepositoryDirectoryPath);
+        var portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _internalPort = fixture.Create<int>() % 100 + 30000;
         WaitUntilPortFree();
-        _externalPort = PortManager.Default.TakePort(new Range<int>(UniquePorts.FluentDockerContainerManagerTests));
+        _externalPort = portManager.TakePort(new Range<int>(UniquePorts.FluentDockerContainerManagerTests));
         var hosts = new Hosts().Discover();
         _docker = hosts.FirstOrDefault(x => x.IsNative) ?? hosts.FirstOrDefault(x => x.Name == "default")
             ?? throw new SystemException("Could not connect to docker host.");

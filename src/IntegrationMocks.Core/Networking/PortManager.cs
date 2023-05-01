@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Resources;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace IntegrationMocks.Core.Networking;
 
@@ -15,11 +17,23 @@ public class PortManager : IPortManager
 
     private readonly IStringRepository _portNumberRepository;
     private readonly IPortMonitor _portMonitor;
+    private readonly ILogger<PortManager> _logger;
 
-    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor)
+    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor, ILogger<PortManager> logger)
     {
         _portNumberRepository = portNumberRepository;
         _portMonitor = portMonitor;
+        _logger = logger;
+    }
+
+    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor)
+        : this(portNumberRepository, portMonitor, NullLogger<PortManager>.Instance)
+    {
+    }
+
+    public PortManager(ILogger<PortManager> logger)
+        : this(new DirectoryStringRepository(DefaultPortNumberRepositoryDirectoryPath), new PortMonitor(), logger)
+    {
     }
 
     public IPort TakePort(Range<int> portNumberRange)
@@ -75,7 +89,12 @@ public class PortManager : IPortManager
             AppDomain.CurrentDomain.ProcessExit += _processExitHook;
 
             _manager = manager;
+            _manager._logger.LogDebug("Locking port from range {@portNumberRange}.", portNumberRange);
             Number = _manager.CreatePortNumber(ref portNumberRange);
+            _manager._logger.LogDebug(
+                "Locked port {@portNumber} from range {@portNumberRange}.",
+                Number,
+                portNumberRange);
         }
 
         public int Number { get; }
@@ -89,6 +108,7 @@ public class PortManager : IPortManager
 
         protected override bool ReleaseHandle()
         {
+            _manager._logger.LogDebug("Releasing port {@portNumber}.", Number);
             _manager.DeletePortNumber(Number);
             AppDomain.CurrentDomain.ProcessExit -= _processExitHook;
             return true;
