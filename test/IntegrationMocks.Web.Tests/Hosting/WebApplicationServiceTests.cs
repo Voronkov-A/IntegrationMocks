@@ -20,7 +20,7 @@ public class WebApplicationServiceTests
     public WebApplicationServiceTests()
     {
         var fixture = new Fixture();
-        _portManager = PortManager.Default;
+        _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _healthPath = $"/{fixture.Create<string>()}";
     }
 

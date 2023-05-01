@@ -22,7 +22,7 @@ public class DefaultMockServiceTests
     public DefaultMockServiceTests()
     {
         _fixture = new Fixture();
-        _portManager = PortManager.Default;
+        _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _value = _fixture.Create<string>();
     }
 

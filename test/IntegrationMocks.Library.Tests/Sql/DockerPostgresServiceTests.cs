@@ -25,7 +25,7 @@ public class DockerPostgresServiceTests
         var fixture = new Fixture();
         _dockerContainerManager = new FluentDockerContainerManager(
             LoggerFixture.CreateLogger<FluentDockerContainerManager>());
-        _portManager = PortManager.Default;
+        _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _options = fixture.Build<DockerPostgresServiceOptions>().Without(x => x.Image).Create();
     }
 

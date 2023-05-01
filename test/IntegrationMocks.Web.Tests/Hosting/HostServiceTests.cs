@@ -21,7 +21,7 @@ public class HostServiceTests
     public HostServiceTests()
     {
         var fixture = new Fixture();
-        _portManager = PortManager.Default;
+        _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _healthPath = $"/{fixture.Create<string>()}";
     }
 
