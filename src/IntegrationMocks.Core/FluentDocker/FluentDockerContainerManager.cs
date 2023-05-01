@@ -55,7 +55,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
         CancellationToken cancellationToken)
     {
         IDockerContainer container = new FluentDockerContainer(
-            new DockerContainerHandle(this, containerNameGenerator, configure, _logger));
+            new DockerContainerHandle(this, containerNameGenerator, configure));
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -84,7 +84,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
 
             foreach (var container in containers)
             {
-                using (new DockerContainerHandle(this, containerName, container, _logger))
+                using (new DockerContainerHandle(this, containerName, container))
                 {
                 }
             }
@@ -122,13 +122,11 @@ public class FluentDockerContainerManager : IDockerContainerManager
         private readonly FluentDockerContainerManager _manager;
         private readonly string _containerName;
         private readonly EventHandler _processExitHook;
-        private readonly ILogger _logger;
 
         public DockerContainerHandle(
             FluentDockerContainerManager manager,
             INameGenerator containerNameGenerator,
-            Action<IDockerContainerBuilder> configure,
-            ILogger logger)
+            Action<IDockerContainerBuilder> configure)
             : base(IntPtr.Zero, true)
         {
             _processExitHook = WeakDisposeEventHandler.Create(this);
@@ -136,7 +134,6 @@ public class FluentDockerContainerManager : IDockerContainerManager
 
             _manager = manager;
             _containerName = _manager.CreateContainerName(containerNameGenerator);
-            _logger = logger;
 
             var builder = new Builder().UseContainer();
             builder.RemoveVolumesOnDispose(true);
@@ -144,7 +141,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
             configure(containerBuilder);
             builder.WithName(_containerName);
             ContainerService = builder.Build();
-            _logger.LogDebug(
+            _manager._logger.LogDebug(
                 "Starting container {@containerName} with external ports {@externalPorts}.",
                 _containerName,
                 containerBuilder.ExternalPorts);
@@ -154,8 +151,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
         public DockerContainerHandle(
             FluentDockerContainerManager manager,
             string containerName,
-            IContainerService containerService,
-            ILogger logger)
+            IContainerService containerService)
             : base(IntPtr.Zero, true)
         {
             _processExitHook = WeakDisposeEventHandler.Create(this);
@@ -164,8 +160,7 @@ public class FluentDockerContainerManager : IDockerContainerManager
             _manager = manager;
             _containerName = containerName;
             ContainerService = containerService;
-            _logger = logger;
-            _logger.LogDebug("Attaching to container {@containerName}.", _containerName);
+            _manager._logger.LogDebug("Attaching to container {@containerName}.", _containerName);
         }
 
         public IContainerService ContainerService { get; }
@@ -176,11 +171,11 @@ public class FluentDockerContainerManager : IDockerContainerManager
         [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         protected override bool ReleaseHandle()
         {
-            ContainerService?.Destroy();
+            ContainerService?.Destroy(_manager._logger);
 
             if (_containerName != null)
             {
-                _logger.LogDebug("Deleting container {@containerName}.", _containerName);
+                _manager._logger.LogDebug("Deleting container {@containerName}.", _containerName);
                 _manager.DeleteContainerName(_containerName);
             }
 

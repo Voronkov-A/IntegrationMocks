@@ -17,6 +17,7 @@ namespace IntegrationMocks.Core.Tests.FluentDocker;
 public sealed class FluentDockerContainerManagerTests : IDisposable
 {
     private readonly IStringRepository _containerNameRepository;
+    private readonly FluentDockerContainerManager _sut;
     private readonly int _internalPort;
     private readonly IPort _externalPort;
     private readonly IHostService _docker;
@@ -26,6 +27,9 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
         var fixture = new Fixture();
         _containerNameRepository = new DirectoryStringRepository(
             FluentDockerContainerManager.DefaultContainerNameRepositoryDirectoryPath);
+        _sut = new FluentDockerContainerManager(
+            _containerNameRepository,
+            LoggerFixture.CreateLogger<FluentDockerContainerManager>());
         var portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _internalPort = fixture.Create<int>() % 100 + 30000;
         WaitUntilPortFree();
@@ -45,9 +49,8 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     public async Task StartContainer_can_start_busybox_container()
     {
         var nameGenerator = new NameGenerator();
-        var sut = new FluentDockerContainerManager(_containerNameRepository);
 
-        using var container = await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
+        using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         Assert.True(Ping(_externalPort.Number));
         Assert.True(ContainerExists(nameGenerator.LastGeneratedName!));
@@ -57,9 +60,8 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     public async Task StartContainer_marks_container_name_as_used_in_repository()
     {
         var nameGenerator = new NameGenerator();
-        var sut = new FluentDockerContainerManager(_containerNameRepository);
 
-        using var container = await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
+        using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         Assert.Contains(nameGenerator.LastGeneratedName, _containerNameRepository.GetAll());
     }
@@ -68,8 +70,7 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     public async Task StartContainer_creates_container_that_can_be_destroyed_with_dispose()
     {
         var nameGenerator = new NameGenerator();
-        var sut = new FluentDockerContainerManager(_containerNameRepository);
-        using var container = await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
+        using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         container.Dispose();
 
@@ -82,9 +83,8 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     public async Task StartContainer_creates_container_that_can_be_destroyed_with_finalizer()
     {
         var nameGenerator = new NameGenerator();
-        var sut = new FluentDockerContainerManager(_containerNameRepository);
 
-        await CreateContainerAndForget(sut, nameGenerator);
+        await CreateContainerAndForget(_sut, nameGenerator);
         GC.Collect(2);
         GC.WaitForPendingFinalizers();
 
@@ -97,21 +97,19 @@ public sealed class FluentDockerContainerManagerTests : IDisposable
     public async Task StartContainer_throws_when_same_name_is_already_in_use()
     {
         var nameGenerator = new NameGenerator(RandomName.PrefixGuid(nameof(FluentDockerContainerManagerTests)));
-        var sut = new FluentDockerContainerManager(_containerNameRepository);
-        using var container = await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
+        using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None));
+            async () => await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None));
     }
 
     [Fact]
     public async Task DeleteAllContainers_destroys_containers()
     {
         var nameGenerator = new NameGenerator();
-        var sut = new FluentDockerContainerManager(_containerNameRepository);
-        using var container = await sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
+        using var container = await _sut.StartContainer(nameGenerator, ConfigureBusybox, CancellationToken.None);
 
-        await sut.DeleteAllContainers(nameGenerator.Matches, CancellationToken.None);
+        await _sut.DeleteAllContainers(nameGenerator.Matches, CancellationToken.None);
 
         Assert.False(Ping(_externalPort.Number));
         Assert.False(ContainerExists(nameGenerator.LastGeneratedName!));
