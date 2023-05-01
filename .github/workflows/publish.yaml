@@ -21,7 +21,7 @@ jobs:
       - name: Pack
         run: dotnet pack -c Release -p:PackageVersion="${{ env.VERSION }}" -p:PackageProjectUrl="https://github.com/Voronkov-A/IntegrationMocks" -p:Authors="Voronkov-A" IntegrationMocks.nuget.slnf
       - name: Tag and release
-        if: ${{ env.IS_RELEASE == "true" }}
+        if: ${{ env.IS_RELEASE == 'true' }}
         uses: avakar/tag-and-release@v1
         with:
           tag_name: "v{{ env.VERSION }}"
