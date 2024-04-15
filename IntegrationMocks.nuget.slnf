@@ -5,8 +5,8 @@
       "src\\IntegrationMocks.Cleaner\\IntegrationMocks.Cleaner.csproj",
       "src\\IntegrationMocks.Core\\IntegrationMocks.Core.csproj",
       "src\\IntegrationMocks.Modules.AspNetCore\\IntegrationMocks.Modules.AspNetCore.csproj",
-      "src\\IntegrationMocks.Modules.Postgres\\IntegrationMocks.Modules.AspNetCore.csproj",
-      "src\\IntegrationMocks.Modules.Sql\\IntegrationMocks.Modules.AspNetCore.csproj"
+      "src\\IntegrationMocks.Modules.Postgres\\IntegrationMocks.Modules.Postgres.csproj",
+      "src\\IntegrationMocks.Modules.Sql\\IntegrationMocks.Modules.Sql.csproj"
     ]
   }
 }
