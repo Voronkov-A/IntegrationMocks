@@ -1,7 +1,9 @@
 using IntegrationMocks.Core;
 using IntegrationMocks.Core.Networking;
-using IntegrationMocks.Library.Sql;
-using IntegrationMocks.Web.Hosting;
+using IntegrationMocks.Modules.Postgres;
+using IntegrationMocks.Modules.Sql;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationMocks.Sample.Locations.Tests.Fixtures;
@@ -17,7 +19,7 @@ public sealed class LocationsHostFixture : IAsyncLifetime, IDisposable
 
     public IInfrastructureService<SqlServiceContract> Postgres { get; }
 
-    public IInfrastructureService<DefaultHostServiceContract> Locations { get; }
+    public IInfrastructureService<LocationsHostServiceContract> Locations { get; }
 
     public async Task InitializeAsync()
     {

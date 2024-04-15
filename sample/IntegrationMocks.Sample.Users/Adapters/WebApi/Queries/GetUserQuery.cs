@@ -1,4 +1,5 @@
 using MediatR;
+using System;
 
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi.Queries;
 

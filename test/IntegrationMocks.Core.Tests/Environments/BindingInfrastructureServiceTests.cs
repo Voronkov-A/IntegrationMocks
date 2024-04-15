@@ -1,6 +1,11 @@
 using AutoFixture;
 using IntegrationMocks.Core.Environments;
 using IntegrationMocks.Core.Tests.Fixtures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationMocks.Core.Tests.Environments;
@@ -30,7 +35,9 @@ public class BindingInfrastructureServiceTests
         var expectedService = environmentToService[expectedEnvironment];
         Environment.SetEnvironmentVariable(environmentVariableName, expectedEnvironment);
 
-        using var sut = new BindingInfrastructureService<object>(environmentVariableName, bindings);
+        using var sut = new BindingInfrastructureService<object>(
+            environmentVariableName,
+            bindings);
 
         Assert.Same(sut.Contract, expectedService.Contract);
     }
@@ -49,7 +56,9 @@ public class BindingInfrastructureServiceTests
             .ToArray();
         Environment.SetEnvironmentVariable(environmentVariableName, _fixture.Create<string>());
 
-        using var sut = new BindingInfrastructureService<object>(environmentVariableName, bindings);
+        using var sut = new BindingInfrastructureService<object>(
+            environmentVariableName,
+            bindings);
 
         Assert.Same(sut.Contract, defaultService.Contract);
     }
@@ -66,7 +75,9 @@ public class BindingInfrastructureServiceTests
             .Append(ServiceBinding.Create(() => defaultService))
             .ToArray();
 
-        using var sut = new BindingInfrastructureService<object>(_fixture.Create<string>(), bindings);
+        using var sut = new BindingInfrastructureService<object>(
+            _fixture.Create<string>(),
+            bindings);
 
         Assert.Same(sut.Contract, defaultService.Contract);
     }
@@ -78,7 +89,9 @@ public class BindingInfrastructureServiceTests
         var environmentToService = _fixture
             .CreateMany<KeyValuePair<string, TestInfrastructureService>>()
             .ToDictionary(x => x.Key, x => x.Value);
-        var bindings = environmentToService.Select(x => ServiceBinding.Create(x.Key, () => x.Value)).ToArray();
+        var bindings = environmentToService
+            .Select(x => ServiceBinding.Create(x.Key, () => x.Value))
+            .ToArray();
         Environment.SetEnvironmentVariable(environmentVariableName, _fixture.Create<string>());
 
         Assert.Throws<InvalidOperationException>(() => new BindingInfrastructureService<object>(
@@ -103,11 +116,15 @@ public class BindingInfrastructureServiceTests
         var environmentVariableName = _fixture.Create<string>();
         var expectedEnvironment = _fixture.Create<string>();
         var services = _fixture.CreateMany<TestInfrastructureService>().ToList();
-        var bindings = services.Select(x => ServiceBinding.Create(expectedEnvironment, () => x)).ToArray();
+        var bindings = services
+            .Select(x => ServiceBinding.Create(expectedEnvironment, () => x))
+            .ToArray();
         var expectedService = services.Last();
         Environment.SetEnvironmentVariable(environmentVariableName, expectedEnvironment);
 
-        using var sut = new BindingInfrastructureService<object>(environmentVariableName, bindings);
+        using var sut = new BindingInfrastructureService<object>(
+            environmentVariableName,
+            bindings);
 
         Assert.Same(sut.Contract, expectedService.Contract);
     }
@@ -119,7 +136,9 @@ public class BindingInfrastructureServiceTests
         var bindings = services.Select(x => ServiceBinding.Create(() => x)).ToArray();
         var expectedService = services.Last();
 
-        using var sut = new BindingInfrastructureService<object>(_fixture.Create<string>(), bindings);
+        using var sut = new BindingInfrastructureService<object>(
+            _fixture.Create<string>(),
+            bindings);
 
         Assert.Same(sut.Contract, expectedService.Contract);
     }

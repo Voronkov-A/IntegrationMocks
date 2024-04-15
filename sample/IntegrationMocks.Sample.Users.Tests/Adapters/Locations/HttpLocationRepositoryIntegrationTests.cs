@@ -1,12 +1,14 @@
 using AutoFixture;
 using IntegrationMocks.Core;
-using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Sample.Locations.Mocks;
 using IntegrationMocks.Sample.Locations.Mocks.Adapters.WebApi;
 using IntegrationMocks.Sample.Users.Adapters.Locations;
 using IntegrationMocks.Sample.Users.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationMocks.Sample.Users.Tests.Adapters.Locations;
@@ -23,7 +25,7 @@ public class HttpLocationRepositoryIntegrationTests : IClassFixture<LocationsMoc
         _fixture = new Fixture();
         _sut = new HttpLocationRepository(new LocationsOptions()
         {
-            BaseAddress = UriUtils.HttpLocalhost(_locations.Contract.WebApiPort)
+            BaseAddress = new Uri($"http://localhost:{_locations.Contract.WebApiPort}")
         });
     }
 

@@ -1,4 +1,5 @@
 using IntegrationMocks.Sample.Locations.Application.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationMocks.Sample.Locations.Application.Registration;
 

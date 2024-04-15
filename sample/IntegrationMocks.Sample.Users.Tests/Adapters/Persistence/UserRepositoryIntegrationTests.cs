@@ -4,6 +4,9 @@ using IntegrationMocks.Sample.Users.Domain;
 using IntegrationMocks.Sample.Users.Tests.Fixtures;
 using IntegrationMocks.Sample.Users.Tests.Fixtures.Customizations;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationMocks.Sample.Users.Tests.Adapters.Persistence;
@@ -16,7 +19,9 @@ public class UserRepositoryIntegrationTests : IClassFixture<UsersPostgresFixture
     public UserRepositoryIntegrationTests(UsersPostgresFixture postgres)
     {
         _postgres = postgres;
-        _fixture = new Fixture().Customize(new LocationCustomization()).Customize(new UserCustomization());
+        _fixture = new Fixture()
+            .Customize(new LocationCustomization())
+            .Customize(new UserCustomization());
     }
 
     [Fact]

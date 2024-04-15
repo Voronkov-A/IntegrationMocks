@@ -1,5 +1,9 @@
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using IntegrationMocks.Sample.Locations.Adapters.WebApi;
 
 namespace IntegrationMocks.Sample.Locations.Tests.Fixtures;
@@ -20,11 +24,15 @@ public sealed class LocationsHttpClient : IDisposable
         CreateLocationRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var postResponse = await _client.PostAsJsonAsync("/api/locations", request, cancellationToken);
+        using var postResponse = await _client.PostAsJsonAsync(
+            "/api/locations",
+            request,
+            cancellationToken);
 
         if (postResponse.StatusCode != HttpStatusCode.Created)
         {
-            throw new InvalidOperationException($"Unexpected response status code: {postResponse.StatusCode}.");
+            throw new InvalidOperationException(
+                $"Unexpected response status code: {postResponse.StatusCode}.");
         }
 
         return await postResponse
@@ -35,7 +43,9 @@ public sealed class LocationsHttpClient : IDisposable
 
     public async Task<LocationView> Get(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _client.GetFromJsonAsync<LocationView>($"/api/locations/{id}", cancellationToken)
+        return await _client.GetFromJsonAsync<LocationView>(
+            $"/api/locations/{id}",
+            cancellationToken)
             ?? throw new InvalidOperationException("Null content.");
     }
 

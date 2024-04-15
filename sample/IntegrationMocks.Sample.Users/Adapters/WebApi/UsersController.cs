@@ -2,6 +2,9 @@ using IntegrationMocks.Sample.Users.Adapters.WebApi.Queries;
 using IntegrationMocks.Sample.Users.Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi;
 
@@ -18,7 +21,9 @@ public class UsersController : UsersControllerBase
         CreateUserRequest body,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new CreateUserCommand(body.Name, body.LocationId), cancellationToken);
+        var result = await _mediator.Send(
+            new CreateUserCommand(body.Name, body.LocationId),
+            cancellationToken);
 
         if (!result.IsSucceeded)
         {

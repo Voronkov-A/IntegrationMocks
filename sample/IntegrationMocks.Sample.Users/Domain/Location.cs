@@ -1,3 +1,5 @@
+using System;
+
 namespace IntegrationMocks.Sample.Users.Domain;
 
 public readonly struct Location : IEquatable<Location>

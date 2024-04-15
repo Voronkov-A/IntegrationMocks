@@ -1,3 +1,5 @@
+using System;
+
 namespace IntegrationMocks.Core.Environments;
 
 public class ServiceBinding<TContract>
@@ -14,9 +16,9 @@ public class ServiceBinding<TContract>
         Factory = factory;
     }
 
-    public string? EnvironmentName { get; }
+    internal string? EnvironmentName { get; }
 
-    public Func<IInfrastructureService<TContract>> Factory { get; }
+    internal Func<IInfrastructureService<TContract>> Factory { get; }
 }
 
 public static class ServiceBinding

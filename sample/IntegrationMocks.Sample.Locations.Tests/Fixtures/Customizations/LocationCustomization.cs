@@ -1,5 +1,6 @@
 using AutoFixture;
 using IntegrationMocks.Sample.Locations.Domain;
+using System;
 
 namespace IntegrationMocks.Sample.Locations.Tests.Fixtures.Customizations;
 

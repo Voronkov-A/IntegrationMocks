@@ -1,9 +1,12 @@
+using System.Threading;
+using System.Threading.Tasks;
 using System.Transactions;
 using MediatR;
 
 namespace IntegrationMocks.Sample.Users.Application.Common;
 
-public class UnitOfWorkPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class UnitOfWorkPipelineBehavior<TRequest, TResponse> :
+    IPipelineBehavior<TRequest, TResponse>
     where TRequest : IBaseRequest, ICommand
 {
     private readonly IUnitOfWork _unitOfWork;

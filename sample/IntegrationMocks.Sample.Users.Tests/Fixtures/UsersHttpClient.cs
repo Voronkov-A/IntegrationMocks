@@ -1,5 +1,9 @@
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using IntegrationMocks.Sample.Users.Adapters.WebApi;
 
 namespace IntegrationMocks.Sample.Users.Tests.Fixtures;
@@ -20,11 +24,15 @@ public sealed class UsersHttpClient : IDisposable
         CreateUserRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var postResponse = await _client.PostAsJsonAsync("/api/users", request, cancellationToken);
+        using var postResponse = await _client.PostAsJsonAsync(
+            "/api/users",
+            request,
+            cancellationToken);
 
         if (postResponse.StatusCode != HttpStatusCode.Created)
         {
-            throw new InvalidOperationException($"Unexpected response status code: {postResponse.StatusCode}.");
+            throw new InvalidOperationException(
+                $"Unexpected response status code: {postResponse.StatusCode}.");
         }
 
         return await postResponse

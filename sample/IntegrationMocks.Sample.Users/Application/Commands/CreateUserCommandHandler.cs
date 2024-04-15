@@ -1,6 +1,9 @@
+using IntegrationMocks.Sample.Users.Application.Common;
 using IntegrationMocks.Sample.Users.Domain;
-using IntegrationMocks.Sample.Users.Domain.Common;
 using MediatR;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Application.Commands;
 
@@ -20,7 +23,9 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Comma
         _locationRepository = locationRepository;
     }
 
-    public async Task<CommandResult<Guid>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<CommandResult<Guid>> Handle(
+        CreateUserCommand request,
+        CancellationToken cancellationToken)
     {
         var location = await _locationRepository.Find(request.LocationId, cancellationToken);
 

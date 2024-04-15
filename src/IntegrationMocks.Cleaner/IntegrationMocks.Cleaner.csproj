@@ -1,25 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <EnableDefaultContentItems>false</EnableDefaultContentItems>
-        <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
-        <OutputType>Exe</OutputType>
-        <NoWarn>NU5104</NoWarn>
-        <AssemblyName>IntegrationMocks.Cleaner</AssemblyName>
-        <PackAsTool>true</PackAsTool>
-        <ToolCommandName>integrationtools.cleaner</ToolCommandName>
-        <Description>IntegrationMocks cleaning global tool.</Description>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
+    <OutputType>Exe</OutputType>
+    <NoWarn>NU5104</NoWarn>
+    <AssemblyName>IntegrationMocks.Cleaner</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>integrationtools.cleaner</ToolCommandName>
+    <Description>IntegrationMocks cleaning global tool.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

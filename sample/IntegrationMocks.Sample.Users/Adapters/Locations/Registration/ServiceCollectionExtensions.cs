@@ -1,10 +1,13 @@
 using IntegrationMocks.Sample.Users.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Locations.Registration;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddLocations(this IServiceCollection services, LocationsOptions options)
+    public static IServiceCollection AddLocations(
+        this IServiceCollection services,
+        LocationsOptions options)
     {
         return services
             .AddSingleton(options)

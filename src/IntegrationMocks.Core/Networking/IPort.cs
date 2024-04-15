@@ -1,3 +1,5 @@
+using System;
+
 namespace IntegrationMocks.Core.Networking;
 
 public interface IPort : IDisposable

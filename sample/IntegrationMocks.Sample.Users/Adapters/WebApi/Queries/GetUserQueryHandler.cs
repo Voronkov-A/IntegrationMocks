@@ -1,5 +1,7 @@
 using IntegrationMocks.Sample.Users.Domain;
 using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi.Queries;
 

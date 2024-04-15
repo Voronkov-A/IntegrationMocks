@@ -1,7 +1,8 @@
 using AutoFixture;
-using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Sample.Locations.Adapters.WebApi;
 using IntegrationMocks.Sample.Locations.Tests.Fixtures;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationMocks.Sample.Locations.Tests;
@@ -20,7 +21,8 @@ public class UseCaseComponentTests : IClassFixture<LocationsHostFixture>
     [Fact]
     public async Task Create_then_get_location()
     {
-        using var client = new LocationsHttpClient(UriUtils.HttpLocalhost(_host.Locations.Contract.WebApiPort));
+        using var client = new LocationsHttpClient(
+            new Uri($"http://localhost:{_host.Locations.Contract.WebApiPort}"));
         var createLocationRequest = _fixture.Create<CreateLocationRequest>();
 
         var createLocationResponse = await client.Create(createLocationRequest);

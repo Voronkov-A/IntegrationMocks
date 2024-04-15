@@ -1,27 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <EnableDefaultContentItems>false</EnableDefaultContentItems>
-        <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
-    </PropertyGroup>
-    <ItemGroup>
-        <Content Include="../IntegrationMocks.Sample.Locations/Contracts/Locations.WebApi.yaml">
-            <Link>Adapters/WebApi/Locations.WebApi.yaml</Link>
-        </Content>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Moq" Version="4.18.4" />
-        <PackageReference Include="NSwag.MSBuild" Version="13.18.2">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\IntegrationMocks.Web\IntegrationMocks.Web.csproj" />
-    </ItemGroup>
-    <Target Name="NSwag" AfterTargets="BeforeCompile">
-        <Exec Command="$(NSwagExe_Net70) run Adapters/WebApi/Locations.WebApi.nswag" />
-    </Target>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IntegrationMocks.Modules.AspNetCore\IntegrationMocks.Modules.AspNetCore.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="../IntegrationMocks.Sample.Locations/Contracts/Locations.WebApi.yaml">
+      <Link>Adapters/WebApi/Locations.WebApi.yaml</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="NSwag.MSBuild" Version="13.18.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <Target Name="NSwag" AfterTargets="BeforeCompile">
+    <Exec Command="$(NSwagExe_Net70) run Adapters/WebApi/Locations.WebApi.nswag" />
+  </Target>
 </Project>

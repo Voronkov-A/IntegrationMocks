@@ -1,4 +1,5 @@
 using IntegrationMocks.Sample.Users.Application.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationMocks.Sample.Users.Application.Registration;
 

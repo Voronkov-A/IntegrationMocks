@@ -6,9 +6,4 @@ public static class PortManagerExtensions
     {
         return self.TakePort(PortRange.Default);
     }
-
-    public static void DeleteAllPorts(this IPortManager self)
-    {
-        self.DeleteAllPorts(_ => true);
-    }
 }

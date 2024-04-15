@@ -1,4 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Persistence;
 
@@ -14,7 +19,10 @@ public class PersistenceMigrator : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<PersistenceContext>().Database.MigrateAsync(cancellationToken);
+        await scope.ServiceProvider
+            .GetRequiredService<PersistenceContext>()
+            .Database
+            .MigrateAsync(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

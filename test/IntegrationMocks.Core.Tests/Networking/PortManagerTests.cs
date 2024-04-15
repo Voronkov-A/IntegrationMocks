@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Networking;
-using IntegrationMocks.Core.Resources;
-using IntegrationMocks.Core.Tests.Fixtures;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
 
@@ -10,17 +13,20 @@ namespace IntegrationMocks.Core.Tests.Networking;
 
 public class PortManagerTests
 {
-    private readonly IStringRepository _portRepository;
+    private readonly IPortNumberRepository _portRepository;
     private readonly Mock<IPortMonitor> _portMonitorMock;
     private readonly Range<int> _portRange;
     private readonly PortManager _sut;
 
     public PortManagerTests()
     {
-        _portRepository = new InMemoryStringRepository();
+        _portRepository = new InMemoryPortNumberRepository();
         _portMonitorMock = new Mock<IPortMonitor>();
         _portRange = new Range<int>(34243, 34443);
-        _sut = new PortManager(_portRepository, _portMonitorMock.Object);
+        _sut = new PortManager(
+            _portRepository,
+            _portMonitorMock.Object,
+            NullLogger<PortManager>.Instance);
     }
 
     [Fact]
@@ -52,12 +58,15 @@ public class PortManagerTests
     [Fact]
     public async Task TakePort_is_thread_safe()
     {
-        _portMonitorMock.Setup(x => x.GetUsedPorts(It.IsAny<Range<int>>())).Returns(new HashSet<int>());
+        _portMonitorMock
+            .Setup(x => x.GetUsedPorts(It.IsAny<Range<int>>()))
+            .Returns(new HashSet<int>());
         var ports = new List<IPort>(100);
         try
         {
             await Task.WhenAll(
-                Enumerable.Range(0, 100).Select(_ => Task.Run(() => ports.Add(_sut.TakePort(_portRange)))));
+                Enumerable.Range(0, 100)
+                    .Select(_ => Task.Run(() => ports.Add(_sut.TakePort(_portRange)))));
 
             Assert.Equal(ports.Count, ports.Select(x => x.Number).Distinct().Count());
         }
@@ -74,7 +83,7 @@ public class PortManagerTests
 
         using var port = _sut.TakePort(_portRange);
 
-        Assert.Contains(port.Number.ToString(), _portRepository.GetAll());
+        Assert.Contains(port.Number, _portRepository.GetAll());
     }
 
     [Fact]
@@ -86,7 +95,7 @@ public class PortManagerTests
 
         port.Dispose();
 
-        Assert.DoesNotContain(portNumber.ToString(), _portRepository.GetAll());
+        Assert.DoesNotContain(portNumber, _portRepository.GetAll());
     }
 
     [Fact]
@@ -99,7 +108,7 @@ public class PortManagerTests
         GC.Collect(2);
         GC.WaitForPendingFinalizers();
 
-        Assert.DoesNotContain(portNumber.ToString(), _portRepository.GetAll());
+        Assert.DoesNotContain(portNumber, _portRepository.GetAll());
     }
 
     [Fact]
@@ -107,21 +116,10 @@ public class PortManagerTests
     {
         _portMonitorMock
             .Setup(x => x.GetUsedPorts(_portRange))
-            .Returns(Enumerable.Range(_portRange.Min, _portRange.Max - _portRange.Min + 1).ToHashSet());
+            .Returns(
+                Enumerable.Range(_portRange.Min, _portRange.Max - _portRange.Min + 1).ToHashSet());
 
         Assert.Throws<InvalidOperationException>(() => _sut.TakePort(_portRange));
-    }
-
-    [Fact]
-    public void DeleteAllPorts_clears_repository()
-    {
-        _portMonitorMock.Setup(x => x.GetUsedPorts(_portRange)).Returns(new HashSet<int>());
-        using var port = _sut.TakePort(_portRange);
-        var portNumber = port.Number;
-
-        _sut.DeleteAllPorts();
-
-        Assert.DoesNotContain(portNumber.ToString(), _portRepository.GetAll());
     }
 
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]

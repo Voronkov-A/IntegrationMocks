@@ -1,3 +1,5 @@
+using System;
+
 namespace IntegrationMocks.Sample.Users.Adapters.Locations;
 
 public class LocationsOptions

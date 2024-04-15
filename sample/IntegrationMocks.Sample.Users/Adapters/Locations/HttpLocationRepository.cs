@@ -1,6 +1,11 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using IntegrationMocks.Sample.Users.Domain;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Locations;
@@ -25,7 +30,8 @@ public sealed class HttpLocationRepository : ILocationRepository, IDisposable
         {
             HttpStatusCode.OK =>
                 new Location(
-                    (await response.Content.ReadFromJsonAsync<LocationView>(cancellationToken: cancellationToken)
+                    (await response.Content.ReadFromJsonAsync<LocationView>(
+                        cancellationToken: cancellationToken)
                      ?? throw new InvalidOperationException("Null content.")).Id),
             HttpStatusCode.NotFound => null,
             _ => throw new InvalidOperationException($"Unexpected status code: {response.StatusCode}.")

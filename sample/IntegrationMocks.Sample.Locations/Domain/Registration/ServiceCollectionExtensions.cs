@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace IntegrationMocks.Sample.Locations.Domain.Registration;
 
 public static class ServiceCollectionExtensions

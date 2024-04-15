@@ -1,3 +1,5 @@
+using System;
+
 namespace IntegrationMocks.Core.Miscellaneous;
 
 public static class RandomName

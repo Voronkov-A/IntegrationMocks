@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+
 namespace IntegrationMocks.Core.Miscellaneous;
 
 public static class DisposeFlag

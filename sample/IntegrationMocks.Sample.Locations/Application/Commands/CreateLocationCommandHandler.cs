@@ -1,5 +1,8 @@
 using IntegrationMocks.Sample.Locations.Domain;
 using MediatR;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Application.Commands;
 
@@ -14,7 +17,9 @@ public class CreateLocationCommandHandler : IRequestHandler<CreateLocationComman
         _repository = repository;
     }
 
-    public async Task<Guid> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(
+        CreateLocationCommand request,
+        CancellationToken cancellationToken)
     {
         var location = _factory.CreateLocation(request.Name);
         await _repository.Add(location, cancellationToken);

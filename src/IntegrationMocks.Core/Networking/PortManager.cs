@@ -1,38 +1,43 @@
-using System.Runtime.InteropServices;
 using IntegrationMocks.Core.Miscellaneous;
-using IntegrationMocks.Core.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace IntegrationMocks.Core.Networking;
 
 public class PortManager : IPortManager
 {
+    private const int RetryCount = 10;
+
     public static readonly string DefaultPortNumberRepositoryDirectoryPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         $"{nameof(IntegrationMocks)}_{nameof(PortManager)}");
     public static readonly PortManager Default = new(
-        new DirectoryStringRepository(DefaultPortNumberRepositoryDirectoryPath),
-        new PortMonitor());
+        new DirectoryPortNumberRepository(DefaultPortNumberRepositoryDirectoryPath),
+        new PortMonitor(),
+        NullLogger<PortManager>.Instance);
 
-    private readonly IStringRepository _portNumberRepository;
+    private readonly IPortNumberRepository _portNumberRepository;
     private readonly IPortMonitor _portMonitor;
     private readonly ILogger<PortManager> _logger;
 
-    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor, ILogger<PortManager> logger)
+    public PortManager(
+        IPortNumberRepository portNumberRepository,
+        IPortMonitor portMonitor,
+        ILogger<PortManager> logger)
     {
         _portNumberRepository = portNumberRepository;
         _portMonitor = portMonitor;
         _logger = logger;
     }
 
-    public PortManager(IStringRepository portNumberRepository, IPortMonitor portMonitor)
-        : this(portNumberRepository, portMonitor, NullLogger<PortManager>.Instance)
-    {
-    }
-
     public PortManager(ILogger<PortManager> logger)
-        : this(new DirectoryStringRepository(DefaultPortNumberRepositoryDirectoryPath), new PortMonitor(), logger)
+        : this(
+              new DirectoryPortNumberRepository(DefaultPortNumberRepositoryDirectoryPath),
+              new PortMonitor(),
+              logger)
     {
     }
 
@@ -40,32 +45,26 @@ public class PortManager : IPortManager
     {
         if (portNumberRange.Min <= 0)
         {
-            throw new ArgumentException($"Port number {portNumberRange.Min} is negative.", nameof(portNumberRange));
+            throw new ArgumentException(
+                $"Port number {portNumberRange.Min} is negative.",
+                nameof(portNumberRange));
         }
 
         return new PortHandle(this, ref portNumberRange);
     }
 
-    public void DeleteAllPorts(Func<int, bool> portNumberPredicate)
-    {
-        foreach (var portNumber in _portNumberRepository.GetAll().Where(x => portNumberPredicate(int.Parse(x))))
-        {
-            _portNumberRepository.Remove(portNumber);
-        }
-    }
-
     private int CreatePortNumber(ref Range<int> portNumberRange)
     {
-        var usedPorts = _portNumberRepository
-            .GetAll()
-            .Select(int.Parse)
-            .Concat(_portMonitor.GetUsedPorts(portNumberRange))
-            .ToHashSet();
+        _logger.LogDebug("Locking port from range {@portNumberRange}.", portNumberRange);
 
-        for (var port = portNumberRange.Min; port <= portNumberRange.Max; ++port)
+        for (var i = 0; i < RetryCount; ++i)
         {
-            if (!usedPorts.Contains(port) && _portNumberRepository.Add(port.ToString()))
+            if (TryCreatePortNumber(ref portNumberRange, out var port))
             {
+                _logger.LogDebug(
+                    "Locked port {@portNumber} from range {@portNumberRange}.",
+                    port,
+                    portNumberRange);
                 return port;
             }
         }
@@ -73,45 +72,58 @@ public class PortManager : IPortManager
         throw new InvalidOperationException($"Could not find free port within {portNumberRange}.");
     }
 
-    private void DeletePortNumber(int port)
+    private bool TryCreatePortNumber(ref Range<int> portNumberRange, out int portNumber)
     {
-        _portNumberRepository.Remove(port.ToString());
+        var usedPorts = _portNumberRepository
+            .GetAll()
+            .Concat(_portMonitor.GetUsedPorts(portNumberRange))
+            .ToHashSet();
+
+        for (var port = portNumberRange.Min; port <= portNumberRange.Max; ++port)
+        {
+            if (!usedPorts.Contains(port) && _portNumberRepository.Add(port))
+            {
+                portNumber = port;
+                return true;
+            }
+        }
+
+        portNumber = 0;
+        return false;
     }
 
-    private class PortHandle : SafeHandle, IPort
+    private void DeletePortNumber(int port)
+    {
+        _logger.LogDebug("Releasing port {@portNumber}.", port);
+        _portNumberRepository.Remove(port);
+    }
+
+    private class PortHandle : IPort
     {
         private readonly PortManager _manager;
-        private readonly EventHandler _processExitHook;
 
-        public PortHandle(PortManager manager, ref Range<int> portNumberRange) : base(IntPtr.Zero, true)
+        public PortHandle(PortManager manager, ref Range<int> portNumberRange)
         {
-            _processExitHook = WeakDisposeEventHandler.Create(this);
-            AppDomain.CurrentDomain.ProcessExit += _processExitHook;
-
             _manager = manager;
-            _manager._logger.LogDebug("Locking port from range {@portNumberRange}.", portNumberRange);
             Number = _manager.CreatePortNumber(ref portNumberRange);
-            _manager._logger.LogDebug(
-                "Locked port {@portNumber} from range {@portNumberRange}.",
-                Number,
-                portNumberRange);
         }
 
         public int Number { get; }
 
-        public override bool IsInvalid => false;
+        public void Dispose()
+        {
+            _manager.DeletePortNumber(Number);
+            GC.SuppressFinalize(this);
+        }
 
         public override string ToString()
         {
             return Number.ToString();
         }
 
-        protected override bool ReleaseHandle()
+        ~PortHandle()
         {
-            _manager._logger.LogDebug("Releasing port {@portNumber}.", Number);
-            _manager.DeletePortNumber(Number);
-            AppDomain.CurrentDomain.ProcessExit -= _processExitHook;
-            return true;
+            Dispose();
         }
     }
 }

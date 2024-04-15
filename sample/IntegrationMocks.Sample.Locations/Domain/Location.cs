@@ -1,3 +1,5 @@
+using System;
+
 namespace IntegrationMocks.Sample.Locations.Domain;
 
 public class Location

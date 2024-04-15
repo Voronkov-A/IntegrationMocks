@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi.Registration;
 
 public static class ServiceCollectionExtensions

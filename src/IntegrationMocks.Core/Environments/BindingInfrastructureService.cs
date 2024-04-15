@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace IntegrationMocks.Core.Environments;
 
 public class BindingInfrastructureService<TContract> : DecoratingInfrastructureService<TContract>
@@ -22,7 +26,8 @@ public class BindingInfrastructureService<TContract> : DecoratingInfrastructureS
         var binding = bindings.LastOrDefault(x => x.EnvironmentName == environmentName)
                       ?? bindings.LastOrDefault(x => x.EnvironmentName == null);
         return binding == null
-            ? throw new InvalidOperationException($"Could not find binding for environment '{environmentName ?? ""}'.")
+            ? throw new InvalidOperationException(
+                $"Could not find binding for environment '{environmentName ?? ""}'.")
             : binding.Factory();
     }
 }

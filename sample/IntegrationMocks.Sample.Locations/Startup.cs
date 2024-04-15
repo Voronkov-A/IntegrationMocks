@@ -3,6 +3,11 @@ using IntegrationMocks.Sample.Locations.Adapters.Persistence.Registration;
 using IntegrationMocks.Sample.Locations.Adapters.WebApi.Registration;
 using IntegrationMocks.Sample.Locations.Application.Registration;
 using IntegrationMocks.Sample.Locations.Domain.Registration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 
 namespace IntegrationMocks.Sample.Locations;
 
@@ -24,7 +29,7 @@ public class Startup
         services.AddWebApi();
         services.AddPersistence(
             _configuration.GetSection("persistence").Get<PersistenceOptions>()
-            ?? throw new SystemException("Persistence section is required."));
+            ?? throw new ApplicationException("Persistence section is required."));
         services.AddPersistenceMigrations();
     }
 

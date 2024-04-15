@@ -1,11 +1,11 @@
 using IntegrationMocks.Core.Networking;
+using IntegrationMocks.Modules.AspNetCore;
 using IntegrationMocks.Sample.Locations.Mocks.Adapters.WebApi;
-using IntegrationMocks.Web.Mocks;
 using Moq;
 
 namespace IntegrationMocks.Sample.Locations.Mocks;
 
-public class LocationsMockService : DefaultMockService<LocationsMockContract>
+public class LocationsMockService : MockWebApplicationService<LocationsMockContract>
 {
     public LocationsMockService(IPortManager portManager) : base(portManager)
     {
