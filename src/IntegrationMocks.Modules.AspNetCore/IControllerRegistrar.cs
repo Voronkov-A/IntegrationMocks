@@ -3,7 +3,7 @@ using System;
 
 namespace IntegrationMocks.Modules.AspNetCore;
 
-internal interface IControllerRegistrar
+public interface IControllerRegistrar
 {
     Type ControllerType { get; }
 

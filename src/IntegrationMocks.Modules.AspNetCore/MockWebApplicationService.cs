@@ -3,6 +3,7 @@ using IntegrationMocks.Core.Networking;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -28,6 +29,21 @@ public abstract class MockWebApplicationService<TInterface> : WebApplicationServ
     protected void AddController(object controller)
     {
         _controllerRegistrars.Add(new ControllerRegistrar(controller));
+    }
+
+    protected void AddController(Type controllerType)
+    {
+        _controllerRegistrars.Add(new TypeControllerRegistrar(controllerType));
+    }
+
+    protected void AddController(Type controllerType, Action<IServiceCollection> register)
+    {
+        _controllerRegistrars.Add(new DelegateControllerRegistrar(controllerType, register));
+    }
+
+    protected void AddController(IControllerRegistrar controllerRegistrar)
+    {
+        _controllerRegistrars.Add(controllerRegistrar);
     }
 
     protected override WebApplicationBuilder CreateWebApplicationBuilder()
