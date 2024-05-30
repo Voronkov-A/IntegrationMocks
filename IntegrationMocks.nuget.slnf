@@ -7,6 +7,7 @@
       "src\\IntegrationMocks.Modules.AspNetCore\\IntegrationMocks.Modules.AspNetCore.csproj",
       "src\\IntegrationMocks.Modules.Postgres\\IntegrationMocks.Modules.Postgres.csproj",
       "src\\IntegrationMocks.Modules.Sql\\IntegrationMocks.Modules.Sql.csproj"
+      "src\\IntegrationMocks.Modules.Testcontainers\\IntegrationMocks.Modules.Testcontainers.csproj"
     ]
   }
 }
