@@ -5,20 +5,15 @@
     <Nullable>enable</Nullable>
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
     <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
-    <Description>IntegrationMocks Postgres binding.</Description>
+    <Description>IntegrationMocks Testcontainers binding helpers.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <ImplicitUsings>disable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
-    <ProjectReference Include="..\IntegrationMocks.Modules.Sql\IntegrationMocks.Modules.Sql.csproj" />
-    <ProjectReference Include="..\IntegrationMocks.Modules.Testcontainers\IntegrationMocks.Modules.Testcontainers.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Testcontainers" Version="3.8.0" />
   </ItemGroup>
 </Project>

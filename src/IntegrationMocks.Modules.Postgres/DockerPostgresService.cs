@@ -3,6 +3,7 @@ using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Names;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.Sql;
+using IntegrationMocks.Modules.Testcontainers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace IntegrationMocks.Modules.Postgres;
 public sealed class DockerPostgresService : IInfrastructureService<SqlServiceContract>
 {
     private readonly IPort _port;
+    private readonly string _name;
     private readonly PostgreSqlContainer _container;
 
     public DockerPostgresService()
@@ -32,9 +34,10 @@ public sealed class DockerPostgresService : IInfrastructureService<SqlServiceCon
         DockerPostgresServiceOptions options)
     {
         _port = portManager.TakePort(portRange);
+        _name = nameGenerator.GenerateName();
         _container = new PostgreSqlBuilder()
             .WithImage(options.Image)
-            .WithName(nameGenerator.GenerateName())
+            .WithName(_name)
             .WithPortBinding(_port.Number, PostgreSqlBuilder.PostgreSqlPort)
             .WithEnvironment("POSTGRES_USER", options.Username)
             .WithEnvironment("POSTGRES_PASSWORD", options.Password)
@@ -63,7 +66,7 @@ public sealed class DockerPostgresService : IInfrastructureService<SqlServiceCon
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        await _container.StartAsync(cancellationToken);
+        await _container.StartOrInspectAsync(_name, cancellationToken);
     }
 
     public void Dispose()
