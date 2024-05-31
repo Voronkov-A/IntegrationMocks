@@ -14,7 +14,6 @@ namespace IntegrationMocks.Modules.Postgres;
 public sealed class DockerPostgresService : IInfrastructureService<SqlServiceContract>
 {
     private readonly IPort _port;
-    private readonly string _name;
     private readonly PostgreSqlContainer _container;
 
     public DockerPostgresService()
@@ -23,7 +22,12 @@ public sealed class DockerPostgresService : IInfrastructureService<SqlServiceCon
     }
 
     public DockerPostgresService(INameGenerator nameGenerator, IPortManager portManager)
-        : this(nameGenerator, portManager, PortRange.Default, new DockerPostgresServiceOptions())
+        : this(nameGenerator, portManager, PortRange.Default, new DockerPostgresServiceOptions(), false)
+    {
+    }
+
+    public DockerPostgresService(INameGenerator nameGenerator, IPortManager portManager, bool attachOutput)
+        : this(nameGenerator, portManager, PortRange.Default, new DockerPostgresServiceOptions(), attachOutput)
     {
     }
 
@@ -31,17 +35,18 @@ public sealed class DockerPostgresService : IInfrastructureService<SqlServiceCon
         INameGenerator nameGenerator,
         IPortManager portManager,
         Range<int> portRange,
-        DockerPostgresServiceOptions options)
+        DockerPostgresServiceOptions options,
+        bool attachOutput)
     {
         _port = portManager.TakePort(portRange);
-        _name = nameGenerator.GenerateName();
         _container = new PostgreSqlBuilder()
             .WithImage(options.Image)
-            .WithName(_name)
+            .WithName(nameGenerator.GenerateName())
             .WithPortBinding(_port.Number, PostgreSqlBuilder.PostgreSqlPort)
             .WithEnvironment("POSTGRES_USER", options.Username)
             .WithEnvironment("POSTGRES_PASSWORD", options.Password)
             .WithAutoRemove(true)
+            .WithOutput<PostgreSqlBuilder, PostgreSqlContainer>(attachOutput)
             .Build();
 
         Contract = new SqlServiceContract(
@@ -66,7 +71,7 @@ public sealed class DockerPostgresService : IInfrastructureService<SqlServiceCon
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        await _container.StartOrInspectAsync(_name, cancellationToken);
+        await _container.StartAsync(cancellationToken);
     }
 
     public void Dispose()

@@ -33,7 +33,8 @@ public class DockerPostgresServiceTests
             _nameGenerator,
             _portManager,
             PortRange.Default,
-            _options);
+            _options,
+            attachOutput: false);
 
         Assert.Equal("localhost", sut.Contract.Host);
         Assert.True(sut.Contract.Port > 0);
@@ -48,7 +49,8 @@ public class DockerPostgresServiceTests
             _nameGenerator,
             _portManager,
             PortRange.Default,
-            _options);
+            _options,
+            attachOutput: false);
 
         var ping = await Ping(sut.CreatePostgresConnectionString());
         Assert.False(ping);
@@ -61,7 +63,8 @@ public class DockerPostgresServiceTests
             _nameGenerator,
             _portManager,
             PortRange.Default,
-            _options);
+            _options,
+            attachOutput: false);
 
         await sut.InitializeAsync();
 
@@ -76,7 +79,8 @@ public class DockerPostgresServiceTests
             _nameGenerator,
             _portManager,
             PortRange.Default,
-            _options);
+            _options,
+            attachOutput: false);
 
         await sut.InitializeAsync();
         var firstPort = sut.Contract.Port;
@@ -97,7 +101,8 @@ public class DockerPostgresServiceTests
             portRange: new Range<int>(
                 UniquePorts.DockerPostgresServiceTests,
                 UniquePorts.DockerPostgresServiceTests),
-            options: _options);
+            options: _options,
+            attachOutput: false);
         await sut.InitializeAsync();
 
         await sut.DisposeAsync();
