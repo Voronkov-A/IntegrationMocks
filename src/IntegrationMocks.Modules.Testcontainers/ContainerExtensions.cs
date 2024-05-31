@@ -48,7 +48,13 @@ public static class ContainerExtensions
                     All = true
                 },
                 cancellationToken))
-            .First(x => x.Names.Any(x => x == $"/{containerName}" || x == containerName));
+            .FirstOrDefault(x => x.Names.Any(x => x == $"/{containerName}" || x == containerName));
+
+        if (container == null)
+        {
+            return ("", "");
+        }
+
         using var logs = await dockerClient.Containers.GetContainerLogsAsync(
             container.ID,
             tty: false,
