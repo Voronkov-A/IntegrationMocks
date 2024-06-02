@@ -5,7 +5,7 @@ using System.Text;
 
 namespace IntegrationMocks.Modules.Testcontainers.Streams;
 
-internal class DebugOutputStream : Stream
+internal partial class DebugOutputStream : Stream
 {
     private readonly Encoding _encoding;
 
@@ -52,6 +52,6 @@ internal class DebugOutputStream : Stream
     public override void Write(byte[] buffer, int offset, int count)
     {
         var str = _encoding.GetString(buffer, offset, count);
-        Debug.Write(str);
+        DebugWrite(str);
     }
 }
