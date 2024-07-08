@@ -11,6 +11,7 @@ Minimalistic set of simple helpers for writing integration and component tests. 
 * [IntegrationMocks.Core](https://www.nuget.org/packages/IntegrationMocks.Core/)
 * [IntegrationMocks.Modules.AspNetCore](https://www.nuget.org/packages/IntegrationMocks.Modules.AspNetCore/)
 * [IntegrationMocks.Modules.Postgres](https://www.nuget.org/packages/IntegrationMocks.Modules.Postgres/)
+* [IntegrationMocks.Modules.Yugabyte](https://www.nuget.org/packages/IntegrationMocks.Modules.Yugabyte/)
 * [IntegrationMocks.Modules.Sql](https://www.nuget.org/packages/IntegrationMocks.Modules.Sql/)
 
 ## Components
