@@ -35,7 +35,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationMocks.Modules.Po
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationMocks.Modules.AspNetCore.Tests", "test\IntegrationMocks.Modules.AspNetCore.Tests\IntegrationMocks.Modules.AspNetCore.Tests.csproj", "{CB8312E1-E209-4C92-B0F9-F0A626E8CF33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationMocks.Modules.Testcontainers", "src\IntegrationMocks.Modules.Testcontainers\IntegrationMocks.Modules.Testcontainers.csproj", "{0E014EDD-2C9F-457B-B7A7-61C211136600}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationMocks.Modules.Testcontainers", "src\IntegrationMocks.Modules.Testcontainers\IntegrationMocks.Modules.Testcontainers.csproj", "{0E014EDD-2C9F-457B-B7A7-61C211136600}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationMocks.Modules.Yugabyte", "src\IntegrationMocks.Modules.Yugabyte\IntegrationMocks.Modules.Yugabyte.csproj", "{3739405C-489E-4D11-A49B-89EDB0ADCABC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationMocks.Modules.Yugabyte.Tests", "test\IntegrationMocks.Modules.Yugabyte.Tests\IntegrationMocks.Modules.Yugabyte.Tests.csproj", "{A2F49E5C-4A08-449C-B53B-EBEF3604C84B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +103,14 @@ Global
 		{0E014EDD-2C9F-457B-B7A7-61C211136600}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E014EDD-2C9F-457B-B7A7-61C211136600}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E014EDD-2C9F-457B-B7A7-61C211136600}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3739405C-489E-4D11-A49B-89EDB0ADCABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3739405C-489E-4D11-A49B-89EDB0ADCABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3739405C-489E-4D11-A49B-89EDB0ADCABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3739405C-489E-4D11-A49B-89EDB0ADCABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F49E5C-4A08-449C-B53B-EBEF3604C84B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2F49E5C-4A08-449C-B53B-EBEF3604C84B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2F49E5C-4A08-449C-B53B-EBEF3604C84B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2F49E5C-4A08-449C-B53B-EBEF3604C84B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +130,8 @@ Global
 		{ECB7E332-7384-43C1-AEB1-239709F3E571} = {94F20A0E-A18F-4B95-A26F-0844D032B640}
 		{CB8312E1-E209-4C92-B0F9-F0A626E8CF33} = {94F20A0E-A18F-4B95-A26F-0844D032B640}
 		{0E014EDD-2C9F-457B-B7A7-61C211136600} = {B73773FA-B186-4177-8C48-FBE9811F662D}
+		{3739405C-489E-4D11-A49B-89EDB0ADCABC} = {B73773FA-B186-4177-8C48-FBE9811F662D}
+		{A2F49E5C-4A08-449C-B53B-EBEF3604C84B} = {94F20A0E-A18F-4B95-A26F-0844D032B640}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B743EA12-5720-4CBA-9B28-F064610117F1}
