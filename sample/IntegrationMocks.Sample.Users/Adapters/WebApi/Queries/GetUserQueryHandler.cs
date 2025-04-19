@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi.Queries;
 
-public class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserView?>
+internal sealed class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserView?>
 {
     private readonly IUserRepository _repository;
 

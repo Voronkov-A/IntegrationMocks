@@ -1,7 +1,6 @@
 using IntegrationMocks.Core;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.Postgres;
-using IntegrationMocks.Modules.Sql;
 using IntegrationMocks.Sample.Locations.Mocks;
 using System;
 using System.Threading.Tasks;
@@ -19,11 +18,11 @@ public sealed class UsersHostFixture : IAsyncLifetime, IDisposable
         Users = new UsersHostService(portManager, Postgres, Locations);
     }
 
-    public IInfrastructureService<SqlServiceContract> Postgres { get; }
+    internal IInfrastructureService<PostgresServiceContract> Postgres { get; }
 
-    public IInfrastructureService<LocationsMockContract> Locations { get; }
+    internal IInfrastructureService<LocationsMockContract> Locations { get; }
 
-    public IInfrastructureService<UsersHostServiceContract> Users { get; }
+    internal IInfrastructureService<UsersHostServiceContract> Users { get; }
 
     public async Task InitializeAsync()
     {

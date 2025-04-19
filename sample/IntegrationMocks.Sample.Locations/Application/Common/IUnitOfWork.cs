@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Application.Common;
 
-public interface IUnitOfWork
+internal interface IUnitOfWork
 {
     Task Commit(CancellationToken cancellationToken);
 }

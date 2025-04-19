@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace IntegrationMocks.Modules.Testcontainers.Streams;
 
-internal class CompositeOutputStream : Stream
+internal sealed class CompositeOutputStream : Stream
 {
     private readonly List<Stream> _children;
 

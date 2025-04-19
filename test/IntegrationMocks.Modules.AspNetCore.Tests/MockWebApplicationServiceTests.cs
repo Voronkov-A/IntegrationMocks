@@ -13,7 +13,7 @@ using Xunit;
 
 namespace IntegrationMocks.Modules.AspNetCore.Tests;
 
-public class MockWebApplicationServiceTests
+public sealed class MockWebApplicationServiceTests
 {
     private readonly IFixture _fixture;
     private readonly IPortManager _portManager;

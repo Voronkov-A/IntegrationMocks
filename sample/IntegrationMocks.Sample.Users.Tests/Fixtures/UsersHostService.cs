@@ -1,8 +1,8 @@
+using System;
 using IntegrationMocks.Core;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.AspNetCore;
 using IntegrationMocks.Modules.Postgres;
-using IntegrationMocks.Modules.Sql;
 using IntegrationMocks.Sample.Locations.Mocks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,21 +12,24 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Tests.Fixtures;
 
-public class UsersHostService : HostService<UsersHostServiceContract>
+internal sealed class UsersHostService : HostService<UsersHostServiceContract>
 {
     private readonly IPort _webApiPort;
-    private readonly IInfrastructureService<SqlServiceContract> _postgres;
+    private readonly IInfrastructureService<PostgresServiceContract> _postgres;
     private readonly IInfrastructureService<LocationsMockContract> _locationsMock;
 
     public UsersHostService(
         IPortManager portManager,
-        IInfrastructureService<SqlServiceContract> postgres,
+        IInfrastructureService<PostgresServiceContract> postgres,
         IInfrastructureService<LocationsMockContract> locationsMock)
     {
         _webApiPort = portManager.TakePort();
         _postgres = postgres;
         _locationsMock = locationsMock;
-        Contract = new UsersHostServiceContract(_webApiPort.Number);
+        Contract = new UsersHostServiceContract
+        {
+            WebApiUrl = new Uri($"http://localhost:{_webApiPort.Number}")
+        };
     }
 
     public override UsersHostServiceContract Contract { get; }
@@ -37,12 +40,9 @@ public class UsersHostService : HostService<UsersHostServiceContract>
             .ConfigureAppConfiguration(builder => builder.AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    ["Kestrel:EndPoints:Http:Url"]
-                        = $"http://localhost:{_webApiPort.Number}",
-                    ["Persistence:ConnectionString"]
-                        = _postgres.CreatePostgresConnectionString("users"),
-                    ["Locations:BaseAddress"]
-                        = $"http://localhost:{_locationsMock.Contract.WebApiPort}"
+                    ["Kestrel:EndPoints:Http:Url"] = Contract.WebApiUrl.ToString(),
+                    ["Persistence:ConnectionString"] = _postgres.CreatePostgresConnectionString("users"),
+                    ["Locations:BaseAddress"] = _locationsMock.Contract.WebApiUrl.ToString()
                 }))
             .ConfigureWebHostDefaults(builder => builder.UseStartup<Startup>());
     }

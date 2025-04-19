@@ -3,4 +3,4 @@ using System;
 
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi.Queries;
 
-public record GetUserQuery(Guid LocationId) : IRequest<UserView?>;
+internal sealed record GetUserQuery(Guid LocationId) : IRequest<UserView?>;

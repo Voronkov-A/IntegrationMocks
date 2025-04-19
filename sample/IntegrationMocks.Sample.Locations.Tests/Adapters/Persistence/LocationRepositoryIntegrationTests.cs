@@ -11,7 +11,7 @@ using Xunit;
 
 namespace IntegrationMocks.Sample.Locations.Tests.Adapters.Persistence;
 
-public class LocationRepositoryIntegrationTests : IClassFixture<LocationsPostgresFixture>
+public sealed class LocationRepositoryIntegrationTests : IClassFixture<LocationsPostgresFixture>
 {
     private readonly LocationsPostgresFixture _postgres;
     private readonly IFixture _fixture;

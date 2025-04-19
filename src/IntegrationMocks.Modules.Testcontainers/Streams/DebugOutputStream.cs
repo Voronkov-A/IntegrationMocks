@@ -5,7 +5,7 @@ using System.Text;
 
 namespace IntegrationMocks.Modules.Testcontainers.Streams;
 
-internal partial class DebugOutputStream : Stream
+internal sealed partial class DebugOutputStream : Stream
 {
     private readonly Encoding _encoding;
 

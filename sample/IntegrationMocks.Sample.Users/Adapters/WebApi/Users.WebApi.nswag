@@ -1,5 +1,5 @@
 {
-  "runtime": "Net70",
+  "runtime": "Net80",
   "documentGenerator": {
     "fromDocument": {
       "url": "../../Contracts/Users.WebApi.yaml"

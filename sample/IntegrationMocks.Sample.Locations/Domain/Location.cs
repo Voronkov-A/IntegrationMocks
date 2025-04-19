@@ -2,7 +2,7 @@ using System;
 
 namespace IntegrationMocks.Sample.Locations.Domain;
 
-public class Location
+internal sealed class Location
 {
     internal Location(Guid id, string name)
     {

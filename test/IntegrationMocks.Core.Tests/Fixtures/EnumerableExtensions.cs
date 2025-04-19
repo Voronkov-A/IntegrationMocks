@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace IntegrationMocks.Core.Tests.Fixtures;
 
-public static class EnumerableExtensions
+internal static class EnumerableExtensions
 {
     private static readonly Random Random = new();
 

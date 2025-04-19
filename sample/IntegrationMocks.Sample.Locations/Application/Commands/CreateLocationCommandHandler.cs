@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Application.Commands;
 
-public class CreateLocationCommandHandler : IRequestHandler<CreateLocationCommand, Guid>
+internal sealed class CreateLocationCommandHandler : IRequestHandler<CreateLocationCommand, Guid>
 {
     private readonly ILocationFactory _factory;
     private readonly ILocationRepository _repository;

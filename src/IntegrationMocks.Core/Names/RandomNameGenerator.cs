@@ -2,7 +2,7 @@ using IntegrationMocks.Core.Miscellaneous;
 
 namespace IntegrationMocks.Core.Names;
 
-public class RandomNameGenerator : INameGenerator
+public sealed class RandomNameGenerator : INameGenerator
 {
     private readonly string _prefix;
 

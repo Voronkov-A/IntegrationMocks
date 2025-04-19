@@ -11,7 +11,7 @@ using Xunit;
 
 namespace IntegrationMocks.Core.Tests.Networking;
 
-public class PortManagerTests
+public sealed class PortManagerTests
 {
     private readonly IPortNumberRepository _portRepository;
     private readonly Mock<IPortMonitor> _portMonitorMock;

@@ -2,7 +2,7 @@ using System;
 
 namespace IntegrationMocks.Sample.Users.Domain;
 
-public class UserFactory : IUserFactory
+internal sealed class UserFactory : IUserFactory
 {
     public User CreateUser(string name, Location location)
     {

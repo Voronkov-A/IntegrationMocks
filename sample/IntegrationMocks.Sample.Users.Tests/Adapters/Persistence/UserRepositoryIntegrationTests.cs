@@ -11,7 +11,7 @@ using Xunit;
 
 namespace IntegrationMocks.Sample.Users.Tests.Adapters.Persistence;
 
-public class UserRepositoryIntegrationTests : IClassFixture<UsersPostgresFixture>
+public sealed class UserRepositoryIntegrationTests : IClassFixture<UsersPostgresFixture>
 {
     private readonly UsersPostgresFixture _postgres;
     private readonly IFixture _fixture;

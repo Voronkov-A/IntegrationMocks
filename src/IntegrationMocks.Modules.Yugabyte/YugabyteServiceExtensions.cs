@@ -1,14 +1,13 @@
 using IntegrationMocks.Core;
-using IntegrationMocks.Modules.Sql;
 using System.Text.Encodings.Web;
 
-namespace IntegrationMocks.Modules.Postgres;
+namespace IntegrationMocks.Modules.Yugabyte;
 
-public static class SqlServiceExtensions
+public static class YugabyteServiceExtensions
 {
-    public static string CreatePostgresConnectionString(
-        this IInfrastructureService<SqlServiceContract> service,
-        string database = "postgres")
+    public static string CreateYugabyteConnectionString(
+        this IInfrastructureService<YugabyteServiceContract> service,
+        string database = "yugabyte")
     {
         var username = UrlEncoder.Default.Encode(service.Contract.Username);
         var password = UrlEncoder.Default.Encode(service.Contract.Password);

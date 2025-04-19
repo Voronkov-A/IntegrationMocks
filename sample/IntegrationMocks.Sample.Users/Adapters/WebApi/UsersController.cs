@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.WebApi;
 
-public class UsersController : UsersControllerBase
+public sealed class UsersController : UsersControllerBase
 {
     private readonly IMediator _mediator;
 

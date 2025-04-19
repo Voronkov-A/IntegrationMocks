@@ -7,10 +7,7 @@ public static class DisposeFlag
 {
     public static void Check<T>(ref int disposed, T obj) where T : notnull
     {
-        if (Interlocked.CompareExchange(ref disposed, 0, 0) != 0)
-        {
-            throw new ObjectDisposedException(obj.GetType().ToString());
-        }
+        ObjectDisposedException.ThrowIf(Interlocked.CompareExchange(ref disposed, 0, 0) != 0, obj.GetType());
     }
 
     public static bool Mark(ref int disposed)

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Domain;
 
-public interface IUserRepository
+internal interface IUserRepository
 {
     Task Add(User item, CancellationToken cancellationToken);
 

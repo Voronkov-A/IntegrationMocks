@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Application.Commands;
 
-public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, CommandResult<Guid>>
+internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, CommandResult<Guid>>
 {
     private readonly IUserFactory _userFactory;
     private readonly IUserRepository _userRepository;

@@ -2,36 +2,28 @@ using System;
 
 namespace IntegrationMocks.Core.Environments;
 
-public class ServiceBinding<TContract>
-{
-    public ServiceBinding(string environmentName, Func<IInfrastructureService<TContract>> factory)
-    {
-        EnvironmentName = environmentName;
-        Factory = factory;
-    }
-
-    public ServiceBinding(Func<IInfrastructureService<TContract>> factory)
-    {
-        EnvironmentName = null;
-        Factory = factory;
-    }
-
-    internal string? EnvironmentName { get; }
-
-    internal Func<IInfrastructureService<TContract>> Factory { get; }
-}
-
 public static class ServiceBinding
 {
-    public static ServiceBinding<TContract> Create<TContract>(
-        string environmentName,
+    public static IServiceBinding<TContract> Create<TContract>(
+        string environmentVariableName,
+        string environmentVariableValue,
         Func<IInfrastructureService<TContract>> factory)
     {
-        return new ServiceBinding<TContract>(environmentName, factory);
+        return new EnvironmentVariableEqualsServiceBinding<TContract>(
+            environmentVariableName,
+            environmentVariableValue,
+            factory);
     }
 
-    public static ServiceBinding<TContract> Create<TContract>(Func<IInfrastructureService<TContract>> factory)
+    public static IServiceBinding<TContract> Create<TContract>(
+        string environmentName,
+        Func<string, IInfrastructureService<TContract>> factory)
     {
-        return new ServiceBinding<TContract>(factory);
+        return new EnvironmentVariableExistsServiceBinding<TContract>(environmentName, factory);
+    }
+
+    public static IServiceBinding<TContract> Create<TContract>(Func<IInfrastructureService<TContract>> factory)
+    {
+        return new DefaultServiceBinding<TContract>(factory);
     }
 }

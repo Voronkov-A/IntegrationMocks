@@ -1,14 +1,13 @@
 using AutoFixture;
 using IntegrationMocks.Core.Networking;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
 
 namespace IntegrationMocks.Core.Tests.Networking;
 
-public class DirectoryPortNumberRepositoryTests : IDisposable
+public sealed class DirectoryPortNumberRepositoryTests : IDisposable
 {
     private readonly IFixture _fixture;
     private readonly string _directoryPath;

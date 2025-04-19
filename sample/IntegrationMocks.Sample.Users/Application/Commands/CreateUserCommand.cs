@@ -4,6 +4,6 @@ using System;
 
 namespace IntegrationMocks.Sample.Users.Application.Commands;
 
-public record CreateUserCommand(string Name, Guid LocationId) :
+internal sealed record CreateUserCommand(string Name, Guid LocationId) :
     IRequest<CommandResult<Guid>>,
     ICommand;

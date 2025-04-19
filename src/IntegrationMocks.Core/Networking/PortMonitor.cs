@@ -4,7 +4,7 @@ using IntegrationMocks.Core.Miscellaneous;
 
 namespace IntegrationMocks.Core.Networking;
 
-public class PortMonitor : IPortMonitor
+public sealed class PortMonitor : IPortMonitor
 {
     public ISet<int> GetUsedPorts(Range<int> portRange)
     {

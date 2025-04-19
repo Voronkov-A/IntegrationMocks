@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace IntegrationMocks.Sample.Users.Application.Common;
 
-public readonly struct CommandResult<T>
+internal readonly struct CommandResult<T>
 {
     private readonly T? _value;
     private readonly List<string>? _errors;
@@ -49,7 +49,7 @@ public readonly struct CommandResult<T>
     }
 }
 
-public static class CommandResult
+internal static class CommandResult
 {
     public static CommandResult<T> Success<T>(T value)
     {

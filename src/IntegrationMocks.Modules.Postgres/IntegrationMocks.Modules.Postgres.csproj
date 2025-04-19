@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
@@ -15,7 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IntegrationMocks.Core\IntegrationMocks.Core.csproj" />
-    <ProjectReference Include="..\IntegrationMocks.Modules.Sql\IntegrationMocks.Modules.Sql.csproj" />
     <ProjectReference Include="..\IntegrationMocks.Modules.Testcontainers\IntegrationMocks.Modules.Testcontainers.csproj" />
   </ItemGroup>
   <ItemGroup>

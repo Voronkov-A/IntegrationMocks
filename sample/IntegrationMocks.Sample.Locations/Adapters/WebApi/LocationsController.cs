@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Adapters.WebApi;
 
-public class LocationsController : LocationsControllerBase
+public sealed class LocationsController : LocationsControllerBase
 {
     private readonly IMediator _mediator;
 

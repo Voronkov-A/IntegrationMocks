@@ -7,7 +7,7 @@ using Xunit;
 
 namespace IntegrationMocks.Core.Tests.Networking;
 
-public class PortMonitorTests
+public sealed class PortMonitorTests
 {
     private const int Port = UniquePorts.PortMonitorTests;
 

@@ -1,6 +1,6 @@
 namespace IntegrationMocks.Core.Tests.Fixtures;
 
-public class UniquePorts
+internal static class UniquePorts
 {
     public const int PortMonitorTests = 34000;
 

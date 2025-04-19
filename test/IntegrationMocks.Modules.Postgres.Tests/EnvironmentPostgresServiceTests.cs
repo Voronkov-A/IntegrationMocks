@@ -4,7 +4,7 @@ using Xunit;
 
 namespace IntegrationMocks.Modules.Postgres.Tests;
 
-public class EnvironmentPostgresServiceTests
+public sealed class EnvironmentPostgresServiceTests
 {
     private readonly IFixture _fixture;
 
@@ -20,12 +20,13 @@ public class EnvironmentPostgresServiceTests
         var password = _fixture.Create<string>();
         var host = _fixture.Create<string>();
         var port = _fixture.Create<int>() % 100 + 33000;
-        Environment.SetEnvironmentVariable("SqlServiceContract_Username", username);
-        Environment.SetEnvironmentVariable("SqlServiceContract_Password", password);
-        Environment.SetEnvironmentVariable("SqlServiceContract_Host", host);
-        Environment.SetEnvironmentVariable("SqlServiceContract_Port", port.ToString());
+        var variables = _fixture.Create<PostgresEnvironmentVariables>();
+        Environment.SetEnvironmentVariable(variables.Username.Name, username);
+        Environment.SetEnvironmentVariable(variables.Password.Name, password);
+        Environment.SetEnvironmentVariable(variables.Host.Name, host);
+        Environment.SetEnvironmentVariable(variables.Port.Name, port.ToString());
 
-        using var sut = new EnvironmentPostgresService();
+        using var sut = new EnvironmentPostgresService(variables);
 
         Assert.Equal(username, sut.Contract.Username);
         Assert.Equal(password, sut.Contract.Password);

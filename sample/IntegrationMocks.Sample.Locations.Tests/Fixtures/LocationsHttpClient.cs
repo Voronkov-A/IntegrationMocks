@@ -8,7 +8,7 @@ using IntegrationMocks.Sample.Locations.Adapters.WebApi;
 
 namespace IntegrationMocks.Sample.Locations.Tests.Fixtures;
 
-public sealed class LocationsHttpClient : IDisposable
+internal sealed class LocationsHttpClient : IDisposable
 {
     private readonly HttpClient _client;
 

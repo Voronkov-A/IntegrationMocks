@@ -2,7 +2,6 @@ using IntegrationMocks.Core;
 using IntegrationMocks.Core.Environments;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Modules.Postgres;
-using IntegrationMocks.Modules.Sql;
 using IntegrationMocks.Sample.Users.Adapters.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,15 +16,14 @@ public sealed class UsersPostgresFixture : IAsyncLifetime, IDisposable
 
     public UsersPostgresFixture()
     {
-        Postgres = new BindingInfrastructureService<SqlServiceContract>(
-            "GITLAB_CI",
-            ServiceBinding.Create("true", () => new EnvironmentPostgresService()),
+        Postgres = new BindingInfrastructureService<PostgresServiceContract>(
+            ServiceBinding.Create("GITLAB_CI", "true", () => new EnvironmentPostgresService()),
             ServiceBinding.Create(() => new DockerPostgresService()));
         _persistenceConnectionString = Postgres.CreatePostgresConnectionString(
             RandomName.PrefixPidGuid(nameof(UsersPostgresFixture)));
     }
 
-    public IInfrastructureService<SqlServiceContract> Postgres { get; }
+    internal IInfrastructureService<PostgresServiceContract> Postgres { get; }
 
     public async Task InitializeAsync()
     {
@@ -48,7 +46,7 @@ public sealed class UsersPostgresFixture : IAsyncLifetime, IDisposable
         Postgres.Dispose();
     }
 
-    public PersistenceContext CreatePersistenceContext()
+    internal PersistenceContext CreatePersistenceContext()
     {
         var options = new DbContextOptionsBuilder<PersistenceContext>()
             .UseNpgsql(_persistenceConnectionString)

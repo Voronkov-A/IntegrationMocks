@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace IntegrationMocks.Core.Networking;
 
-public class PortManager : IPortManager
+public sealed class PortManager : IPortManager
 {
     private const int RetryCount = 10;
 
@@ -98,7 +98,7 @@ public class PortManager : IPortManager
         _portNumberRepository.Remove(port);
     }
 
-    private class PortHandle : IPort
+    private sealed class PortHandle : IPort
     {
         private readonly PortManager _manager;
 

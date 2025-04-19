@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Domain;
 
-public interface ILocationRepository
+internal interface ILocationRepository
 {
     Task Add(Location item, CancellationToken cancellationToken);
 

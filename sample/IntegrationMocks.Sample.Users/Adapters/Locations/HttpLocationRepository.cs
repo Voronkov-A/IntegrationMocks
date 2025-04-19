@@ -10,7 +10,7 @@ using IntegrationMocks.Sample.Users.Domain;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Locations;
 
-public sealed class HttpLocationRepository : ILocationRepository, IDisposable
+internal sealed class HttpLocationRepository : ILocationRepository, IDisposable
 {
     private readonly HttpClient _client;
 

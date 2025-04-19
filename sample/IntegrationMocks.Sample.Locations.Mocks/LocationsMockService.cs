@@ -1,3 +1,4 @@
+using System;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.AspNetCore;
 using IntegrationMocks.Sample.Locations.Mocks.Adapters.WebApi;
@@ -5,7 +6,7 @@ using Moq;
 
 namespace IntegrationMocks.Sample.Locations.Mocks;
 
-public class LocationsMockService : MockWebApplicationService<LocationsMockContract>
+public sealed class LocationsMockService : MockWebApplicationService<LocationsMockContract>
 {
     public LocationsMockService(IPortManager portManager) : base(portManager)
     {
@@ -13,7 +14,11 @@ public class LocationsMockService : MockWebApplicationService<LocationsMockContr
         {
             CallBase = true
         };
-        Contract = new LocationsMockContract(WebApiPort.Number, locationsController);
+        Contract = new LocationsMockContract
+        {
+            WebApiUrl = new Uri($"http://localhost:{WebApiPort.Number}"),
+            LocationsController = locationsController
+        };
         AddController(locationsController.Object);
     }
 

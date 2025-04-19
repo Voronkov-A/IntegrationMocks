@@ -2,7 +2,7 @@ using System;
 
 namespace IntegrationMocks.Sample.Users.Domain;
 
-public class User
+internal sealed class User
 {
     internal User(Guid id, string name, Location location)
     {

@@ -4,7 +4,7 @@ using System;
 
 namespace IntegrationMocks.Sample.Users.Tests.Fixtures.Customizations;
 
-public class UserCustomization : ICustomization
+internal sealed class UserCustomization : ICustomization
 {
     public void Customize(IFixture fixture)
     {

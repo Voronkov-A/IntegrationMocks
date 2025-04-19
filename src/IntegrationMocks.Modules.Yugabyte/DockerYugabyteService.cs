@@ -5,8 +5,6 @@ using IntegrationMocks.Core;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Names;
 using IntegrationMocks.Core.Networking;
-using IntegrationMocks.Modules.Sql;
-using IntegrationMocks.Modules.Testcontainers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -14,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Modules.Yugabyte;
 
-public class DockerYugabyteService : IInfrastructureService<SqlServiceContract>
+public sealed class DockerYugabyteService : IInfrastructureService<YugabyteServiceContract>
 {
     private readonly IPort _port;
     private readonly IContainer _container;
@@ -25,42 +23,50 @@ public class DockerYugabyteService : IInfrastructureService<SqlServiceContract>
     }
 
     public DockerYugabyteService(INameGenerator nameGenerator, IPortManager portManager)
-        : this(nameGenerator, portManager, PortRange.Default, new DockerYugabyteServiceOptions(), false)
-    {
-    }
-
-    public DockerYugabyteService(INameGenerator nameGenerator, IPortManager portManager, bool attachOutput)
-        : this(nameGenerator, portManager, PortRange.Default, new DockerYugabyteServiceOptions(), attachOutput)
+        : this(nameGenerator, portManager, new DockerYugabyteServiceOptions())
     {
     }
 
     public DockerYugabyteService(
         INameGenerator nameGenerator,
         IPortManager portManager,
-        Range<int> portRange,
-        DockerYugabyteServiceOptions options,
-        bool attachOutput)
+        DockerYugabyteServiceOptions options)
     {
-        _port = portManager.TakePort(portRange);
+        try
+        {
+            _port = portManager.TakePort(options.PortRange);
 
-        Contract = new SqlServiceContract(
-            username: "yugabyte",
-            password: "yugabyte",
-            host: "localhost",
-            port: _port.Number);
+            Contract = new YugabyteServiceContract
+            {
+                Username = "yugabyte",
+                Password = "yugabyte",
+                Host = "localhost",
+                Port = _port.Number
+            };
 
-        _container = new ContainerBuilder()
-            .WithImage(options.Image)
-            .WithName(nameGenerator.GenerateName())
-            .WithPortBinding(_port.Number, 5433)
-            .WithAutoRemove(true)
-            .WithOutput<ContainerBuilder, IContainer>(attachOutput)
-            .WithCommand("bin/yugabyted", "start", "--background=false")
-            .WithWaitStrategy(Wait.ForUnixContainer().AddCustomWaitStrategy(new WaitStrategy(Contract)))
-            .Build();
+            var builder = new ContainerBuilder()
+                .WithImage(options.Image)
+                .WithName(nameGenerator.GenerateName())
+                .WithPortBinding(_port.Number, 5433)
+                .WithAutoRemove(true)
+                .WithCommand("bin/yugabyted", "start", "--background=false")
+                .WithWaitStrategy(Wait.ForUnixContainer().AddCustomWaitStrategy(new WaitStrategy(Contract)));
+
+            if (options.OutputConsumer != null)
+            {
+                builder = builder.WithOutputConsumer(options.OutputConsumer);
+            }
+
+            _container = builder.Build();
+        }
+        catch
+        {
+            Dispose();
+            throw;
+        }
     }
 
-    public SqlServiceContract Contract { get; }
+    public YugabyteServiceContract Contract { get; }
 
     public async ValueTask DisposeAsync()
     {
@@ -95,9 +101,9 @@ public class DockerYugabyteService : IInfrastructureService<SqlServiceContract>
 
     private class WaitStrategy : IWaitUntil
     {
-        private readonly SqlServiceContract _contract;
+        private readonly YugabyteServiceContract _contract;
 
-        public WaitStrategy(SqlServiceContract contract)
+        public WaitStrategy(YugabyteServiceContract contract)
         {
             _contract = contract;
         }

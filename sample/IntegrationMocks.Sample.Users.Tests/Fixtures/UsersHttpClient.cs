@@ -8,7 +8,7 @@ using IntegrationMocks.Sample.Users.Adapters.WebApi;
 
 namespace IntegrationMocks.Sample.Users.Tests.Fixtures;
 
-public sealed class UsersHttpClient : IDisposable
+internal sealed class UsersHttpClient : IDisposable
 {
     private readonly HttpClient _client;
 

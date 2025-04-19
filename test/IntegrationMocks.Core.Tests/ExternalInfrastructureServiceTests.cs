@@ -2,7 +2,7 @@ using Xunit;
 
 namespace IntegrationMocks.Core.Tests;
 
-public class ExternalInfrastructureServiceTests
+public sealed class ExternalInfrastructureServiceTests
 {
     [Fact]
     public void Contract_is_passed_as_is()

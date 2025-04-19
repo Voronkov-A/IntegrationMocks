@@ -3,7 +3,7 @@ using System;
 
 namespace IntegrationMocks.Modules.AspNetCore;
 
-internal class DelegateControllerRegistrar : IControllerRegistrar
+internal sealed class DelegateControllerRegistrar : IControllerRegistrar
 {
     public DelegateControllerRegistrar(Type controllerType, Action<IServiceCollection> register)
     {

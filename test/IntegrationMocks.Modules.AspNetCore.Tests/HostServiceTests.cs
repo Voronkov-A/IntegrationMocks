@@ -15,7 +15,7 @@ using Xunit;
 
 namespace IntegrationMocks.Modules.AspNetCore.Tests;
 
-public class HostServiceTests
+public sealed class HostServiceTests
 {
     private readonly IPortManager _portManager;
     private readonly string _healthPath;

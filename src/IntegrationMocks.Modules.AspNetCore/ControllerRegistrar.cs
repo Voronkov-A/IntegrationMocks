@@ -3,7 +3,7 @@ using System;
 
 namespace IntegrationMocks.Modules.AspNetCore;
 
-internal class ControllerRegistrar : IControllerRegistrar
+internal sealed class ControllerRegistrar : IControllerRegistrar
 {
     private readonly object _controller;
 

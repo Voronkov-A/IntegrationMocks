@@ -3,7 +3,7 @@ using System;
 
 namespace IntegrationMocks.Modules.AspNetCore;
 
-internal class TypeControllerRegistrar : IControllerRegistrar
+internal sealed class TypeControllerRegistrar : IControllerRegistrar
 {
     public TypeControllerRegistrar(Type controllerType)
     {

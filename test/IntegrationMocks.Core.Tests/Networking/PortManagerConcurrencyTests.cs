@@ -17,7 +17,7 @@ namespace IntegrationMocks.Core.Tests.Networking;
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Usage",
     "xUnit1004:Test methods should not be skipped")]
-public class PortManagerConcurrencyTests
+public sealed class PortManagerConcurrencyTests
 {
     private readonly SemaphoreSlim _limiter = new(300);
 

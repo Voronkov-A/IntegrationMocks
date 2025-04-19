@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace IntegrationMocks.Modules.AspNetCore;
 
-internal class ExplicitControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
+internal sealed class ExplicitControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
 {
     private readonly List<Type> _controllerTypes;
 

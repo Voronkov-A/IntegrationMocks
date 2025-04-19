@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationMocks.Sample.Locations.Domain.Registration;
 
-public static class ServiceCollectionExtensions
+internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDomain(this IServiceCollection services)
     {

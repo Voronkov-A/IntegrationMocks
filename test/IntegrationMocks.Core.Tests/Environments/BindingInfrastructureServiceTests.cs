@@ -10,7 +10,7 @@ using Xunit;
 
 namespace IntegrationMocks.Core.Tests.Environments;
 
-public class BindingInfrastructureServiceTests
+public sealed class BindingInfrastructureServiceTests
 {
     private readonly IFixture _fixture;
 
@@ -28,16 +28,14 @@ public class BindingInfrastructureServiceTests
             .ToDictionary(x => x.Key, x => x.Value);
         var defaultService = new TestInfrastructureService();
         var bindings = environmentToService
-            .Select(x => ServiceBinding.Create(x.Key, () => x.Value))
+            .Select(x => ServiceBinding.Create(environmentVariableName, x.Key, () => x.Value))
             .Append(ServiceBinding.Create(() => defaultService))
             .ToArray();
         var expectedEnvironment = environmentToService.Keys.Shuffle().First();
         var expectedService = environmentToService[expectedEnvironment];
         Environment.SetEnvironmentVariable(environmentVariableName, expectedEnvironment);
 
-        using var sut = new BindingInfrastructureService<object>(
-            environmentVariableName,
-            bindings);
+        using var sut = new BindingInfrastructureService<object>(bindings);
 
         Assert.Same(sut.Contract, expectedService.Contract);
     }
@@ -51,14 +49,12 @@ public class BindingInfrastructureServiceTests
             .ToDictionary(x => x.Key, x => x.Value);
         var defaultService = new TestInfrastructureService();
         var bindings = environmentToService
-            .Select(x => ServiceBinding.Create(x.Key, () => x.Value))
+            .Select(x => ServiceBinding.Create(environmentVariableName, x.Key, () => x.Value))
             .Append(ServiceBinding.Create(() => defaultService))
             .ToArray();
         Environment.SetEnvironmentVariable(environmentVariableName, _fixture.Create<string>());
 
-        using var sut = new BindingInfrastructureService<object>(
-            environmentVariableName,
-            bindings);
+        using var sut = new BindingInfrastructureService<object>(bindings);
 
         Assert.Same(sut.Contract, defaultService.Contract);
     }
@@ -71,13 +67,11 @@ public class BindingInfrastructureServiceTests
             .ToDictionary(x => x.Key, x => x.Value);
         var defaultService = new TestInfrastructureService();
         var bindings = environmentToService
-            .Select(x => ServiceBinding.Create(x.Key, () => x.Value))
+            .Select(x => ServiceBinding.Create(_fixture.Create<string>(), x.Key, () => x.Value))
             .Append(ServiceBinding.Create(() => defaultService))
             .ToArray();
 
-        using var sut = new BindingInfrastructureService<object>(
-            _fixture.Create<string>(),
-            bindings);
+        using var sut = new BindingInfrastructureService<object>(bindings);
 
         Assert.Same(sut.Contract, defaultService.Contract);
     }
@@ -90,60 +84,49 @@ public class BindingInfrastructureServiceTests
             .CreateMany<KeyValuePair<string, TestInfrastructureService>>()
             .ToDictionary(x => x.Key, x => x.Value);
         var bindings = environmentToService
-            .Select(x => ServiceBinding.Create(x.Key, () => x.Value))
+            .Select(x => ServiceBinding.Create(_fixture.Create<string>(), x.Key, () => x.Value))
             .ToArray();
         Environment.SetEnvironmentVariable(environmentVariableName, _fixture.Create<string>());
 
-        Assert.Throws<InvalidOperationException>(() => new BindingInfrastructureService<object>(
-            environmentVariableName,
-            bindings));
+        Assert.Throws<InvalidOperationException>(() => new BindingInfrastructureService<object>(bindings));
     }
 
     [Fact]
     public void Constructor_throws_when_binding_list_is_empty()
     {
-        var environmentVariableName = _fixture.Create<string>();
-        Environment.SetEnvironmentVariable(environmentVariableName, _fixture.Create<string>());
-
-        Assert.Throws<InvalidOperationException>(() => new BindingInfrastructureService<object>(
-            environmentVariableName,
-            Array.Empty<ServiceBinding<object>>()));
+        Assert.Throws<InvalidOperationException>(() => new BindingInfrastructureService<object>());
     }
 
     [Fact]
-    public void Constructor_uses_last_matching_binding()
+    public void Constructor_uses_first_matching_binding()
     {
         var environmentVariableName = _fixture.Create<string>();
         var expectedEnvironment = _fixture.Create<string>();
         var services = _fixture.CreateMany<TestInfrastructureService>().ToList();
         var bindings = services
-            .Select(x => ServiceBinding.Create(expectedEnvironment, () => x))
+            .Select(x => ServiceBinding.Create(environmentVariableName, expectedEnvironment, () => x))
             .ToArray();
-        var expectedService = services.Last();
+        var expectedService = services.First();
         Environment.SetEnvironmentVariable(environmentVariableName, expectedEnvironment);
 
-        using var sut = new BindingInfrastructureService<object>(
-            environmentVariableName,
-            bindings);
+        using var sut = new BindingInfrastructureService<object>(bindings);
 
         Assert.Same(sut.Contract, expectedService.Contract);
     }
 
     [Fact]
-    public void Constructor_uses_last_default_binding()
+    public void Constructor_uses_first_default_binding()
     {
         var services = _fixture.CreateMany<TestInfrastructureService>().ToList();
         var bindings = services.Select(x => ServiceBinding.Create(() => x)).ToArray();
-        var expectedService = services.Last();
+        var expectedService = services.First();
 
-        using var sut = new BindingInfrastructureService<object>(
-            _fixture.Create<string>(),
-            bindings);
+        using var sut = new BindingInfrastructureService<object>(bindings);
 
         Assert.Same(sut.Contract, expectedService.Contract);
     }
 
-    private class TestInfrastructureService : IInfrastructureService<object>
+    private sealed class TestInfrastructureService : IInfrastructureService<object>
     {
         public object Contract { get; } = new();
 

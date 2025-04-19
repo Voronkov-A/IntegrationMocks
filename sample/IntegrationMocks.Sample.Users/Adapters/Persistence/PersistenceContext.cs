@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Persistence;
 
-public class PersistenceContext : DbContext
+internal sealed class PersistenceContext : DbContext
 {
     public PersistenceContext(DbContextOptions<PersistenceContext> options) : base(options)
     {

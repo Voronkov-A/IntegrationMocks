@@ -13,7 +13,7 @@ using System;
 
 namespace IntegrationMocks.Sample.Users;
 
-public class Startup
+internal sealed class Startup
 {
     private readonly IConfiguration _configuration;
 

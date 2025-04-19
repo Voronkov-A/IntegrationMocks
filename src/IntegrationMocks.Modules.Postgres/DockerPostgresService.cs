@@ -2,8 +2,6 @@ using IntegrationMocks.Core;
 using IntegrationMocks.Core.Miscellaneous;
 using IntegrationMocks.Core.Names;
 using IntegrationMocks.Core.Networking;
-using IntegrationMocks.Modules.Sql;
-using IntegrationMocks.Modules.Testcontainers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +9,7 @@ using Testcontainers.PostgreSql;
 
 namespace IntegrationMocks.Modules.Postgres;
 
-public sealed class DockerPostgresService : IInfrastructureService<SqlServiceContract>
+public sealed class DockerPostgresService : IInfrastructureService<PostgresServiceContract>
 {
     private readonly IPort _port;
     private readonly PostgreSqlContainer _container;
@@ -22,41 +20,49 @@ public sealed class DockerPostgresService : IInfrastructureService<SqlServiceCon
     }
 
     public DockerPostgresService(INameGenerator nameGenerator, IPortManager portManager)
-        : this(nameGenerator, portManager, PortRange.Default, new DockerPostgresServiceOptions(), false)
-    {
-    }
-
-    public DockerPostgresService(INameGenerator nameGenerator, IPortManager portManager, bool attachOutput)
-        : this(nameGenerator, portManager, PortRange.Default, new DockerPostgresServiceOptions(), attachOutput)
+        : this(nameGenerator, portManager, new DockerPostgresServiceOptions())
     {
     }
 
     public DockerPostgresService(
         INameGenerator nameGenerator,
         IPortManager portManager,
-        Range<int> portRange,
-        DockerPostgresServiceOptions options,
-        bool attachOutput)
+        DockerPostgresServiceOptions options)
     {
-        _port = portManager.TakePort(portRange);
-        _container = new PostgreSqlBuilder()
-            .WithImage(options.Image)
-            .WithName(nameGenerator.GenerateName())
-            .WithPortBinding(_port.Number, PostgreSqlBuilder.PostgreSqlPort)
-            .WithEnvironment("POSTGRES_USER", options.Username)
-            .WithEnvironment("POSTGRES_PASSWORD", options.Password)
-            .WithAutoRemove(true)
-            .WithOutput<PostgreSqlBuilder, PostgreSqlContainer>(attachOutput)
-            .Build();
+        try
+        {
+            _port = portManager.TakePort(options.PortRange);
+            var builder = new PostgreSqlBuilder()
+                .WithImage(options.Image)
+                .WithName(nameGenerator.GenerateName())
+                .WithPortBinding(_port.Number, PostgreSqlBuilder.PostgreSqlPort)
+                .WithEnvironment("POSTGRES_USER", options.Username)
+                .WithEnvironment("POSTGRES_PASSWORD", options.Password)
+                .WithAutoRemove(true);
 
-        Contract = new SqlServiceContract(
-            username: options.Username,
-            password: options.Password,
-            host: "localhost",
-            port: _port.Number);
+            if (options.OutputConsumer != null)
+            {
+                builder = builder.WithOutputConsumer(options.OutputConsumer);
+            }
+
+            _container = builder.Build();
+
+            Contract = new PostgresServiceContract
+            {
+                Username = options.Username,
+                Password = options.Password,
+                Host = "localhost",
+                Port = _port.Number
+            };
+        }
+        catch
+        {
+            Dispose();
+            throw;
+        }
     }
 
-    public SqlServiceContract Contract { get; }
+    public PostgresServiceContract Contract { get; }
 
     public async ValueTask DisposeAsync()
     {

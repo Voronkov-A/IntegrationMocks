@@ -13,7 +13,7 @@ using Xunit;
 
 namespace IntegrationMocks.Sample.Users.Tests.Adapters.Locations;
 
-public class HttpLocationRepositoryIntegrationTests : IClassFixture<LocationsMockFixture>
+public sealed class HttpLocationRepositoryIntegrationTests : IClassFixture<LocationsMockFixture>
 {
     private readonly IInfrastructureService<LocationsMockContract> _locations;
     private readonly IFixture _fixture;
@@ -25,7 +25,7 @@ public class HttpLocationRepositoryIntegrationTests : IClassFixture<LocationsMoc
         _fixture = new Fixture();
         _sut = new HttpLocationRepository(new LocationsOptions()
         {
-            BaseAddress = new Uri($"http://localhost:{_locations.Contract.WebApiPort}")
+            BaseAddress = _locations.Contract.WebApiUrl
         });
     }
 

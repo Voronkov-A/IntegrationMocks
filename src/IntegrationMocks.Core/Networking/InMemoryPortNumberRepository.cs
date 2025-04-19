@@ -7,7 +7,7 @@ namespace IntegrationMocks.Core.Networking;
 /// <summary>
 /// Warning: this implementation assumes that we have exactly one test process in time.
 /// </summary>
-public class InMemoryPortNumberRepository : IPortNumberRepository
+public sealed class InMemoryPortNumberRepository : IPortNumberRepository
 {
     private readonly ConcurrentDictionary<int, int> _items;
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Adapters.Persistence.Common;
 
-public class DbContextUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+internal sealed class DbContextUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
 {
     private readonly TContext _context;
 

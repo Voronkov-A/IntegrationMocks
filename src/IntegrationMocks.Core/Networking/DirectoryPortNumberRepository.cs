@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace IntegrationMocks.Core.Networking;
 
-public class DirectoryPortNumberRepository : IPortNumberRepository
+public sealed class DirectoryPortNumberRepository : IPortNumberRepository
 {
     private readonly string _directoryPath;
 

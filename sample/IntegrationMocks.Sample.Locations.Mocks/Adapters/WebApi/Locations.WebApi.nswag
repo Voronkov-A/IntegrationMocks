@@ -1,5 +1,5 @@
 {
-  "runtime": "Net70",
+  "runtime": "Net80",
   "documentGenerator": {
     "fromDocument": {
       "url": "../../../IntegrationMocks.Sample.Locations/Contracts/Locations.WebApi.yaml"

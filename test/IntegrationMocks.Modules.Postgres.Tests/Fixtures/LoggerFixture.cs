@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IntegrationMocks.Modules.Postgres.Tests.Fixtures;
 
-public static class LoggerFixture
+internal static class LoggerFixture
 {
     private static readonly ILoggerFactory LoggerFactory
         = Microsoft.Extensions.Logging.LoggerFactory.Create(x => x

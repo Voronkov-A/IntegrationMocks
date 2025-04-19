@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Adapters.Persistence;
 
-public class LocationRepository : ILocationRepository
+internal sealed class LocationRepository : ILocationRepository
 {
     private readonly PersistenceContext _context;
 

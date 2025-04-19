@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Persistence;
 
-public class UserRepository : IUserRepository
+internal sealed class UserRepository : IUserRepository
 {
     private readonly PersistenceContext _context;
 

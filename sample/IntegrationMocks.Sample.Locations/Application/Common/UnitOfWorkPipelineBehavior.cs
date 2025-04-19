@@ -5,7 +5,7 @@ using MediatR;
 
 namespace IntegrationMocks.Sample.Locations.Application.Common;
 
-public class UnitOfWorkPipelineBehavior<TRequest, TResponse> :
+internal sealed class UnitOfWorkPipelineBehavior<TRequest, TResponse> :
     IPipelineBehavior<TRequest, TResponse>
     where TRequest : IBaseRequest, ICommand
 {

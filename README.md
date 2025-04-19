@@ -10,18 +10,19 @@ Minimalistic set of simple helpers for writing integration and component tests. 
 * [IntegrationMocks.Cleaner](https://www.nuget.org/packages/IntegrationMocks.Cleaner/)
 * [IntegrationMocks.Core](https://www.nuget.org/packages/IntegrationMocks.Core/)
 * [IntegrationMocks.Modules.AspNetCore](https://www.nuget.org/packages/IntegrationMocks.Modules.AspNetCore/)
+* [IntegrationMocks.Modules.MySql](https://www.nuget.org/packages/IntegrationMocks.Modules.MySql/)
 * [IntegrationMocks.Modules.Postgres](https://www.nuget.org/packages/IntegrationMocks.Modules.Postgres/)
 * [IntegrationMocks.Modules.Yugabyte](https://www.nuget.org/packages/IntegrationMocks.Modules.Yugabyte/)
-* [IntegrationMocks.Modules.Sql](https://www.nuget.org/packages/IntegrationMocks.Modules.Sql/)
 
 ## Components
 * [IntegrationMocks.Cleaner](src/IntegrationMocks.Cleaner/README.md) - this tool may be used to clean up resources that were not released because of process termination.
 * [IntegrationMocks.Core](src/IntegrationMocks.Core/README.md) - core library that contains abstractions and a minimal docker wrapper.
 * [IntegrationMocks.Modules.AspNetCore](src/IntegrationMocks.Modules.AspNetCore/README.md) - library that contains basic wrappers for ASP.NET host services.
+* [IntegrationMocks.Modules.MySql](src/IntegrationMocks.Modules.Postgres/README.md) - library that contains wrappers for MySQL service.
 * [IntegrationMocks.Modules.Postgres](src/IntegrationMocks.Modules.Postgres/README.md) - library that contains wrappers for Postgres service.
-* [IntegrationMocks.Modules.Sql](src/IntegrationMocks.Modules.Sql/README.md) - auxiliary library that contains common SQL abstractions.
+* [IntegrationMocks.Modules.Yugabyte](src/IntegrationMocks.Modules.Postgres/README.md) - library that contains wrappers for Yugabyte service.
 
 ## Samples
 * [IntegrationMocks.Sample](sample/README.md) - sample.
 * [IntegrationMocks.Modules.Postgres.Tests](test/IntegrationMocks.Modules.Postgres.Tests) - tests for Postgres.
-* [IntegrationMocks.Modules.AspNetCore](test/IntegrationMocks.Modules.AspNetCore.Tests) - tests for API mocks and component SUTs.
+* [IntegrationMocks.Modules.AspNetCore.Tests](test/IntegrationMocks.Modules.AspNetCore.Tests) - tests for API mocks and component SUTs.

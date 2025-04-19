@@ -14,7 +14,7 @@ using Xunit;
 
 namespace IntegrationMocks.Modules.AspNetCore.Tests;
 
-public class WebApplicationServiceTests
+public sealed class WebApplicationServiceTests
 {
     private readonly IPortManager _portManager;
     private readonly string _healthPath;

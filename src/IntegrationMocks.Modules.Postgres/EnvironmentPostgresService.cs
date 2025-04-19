@@ -1,25 +1,20 @@
 using IntegrationMocks.Core;
-using IntegrationMocks.Modules.Sql;
-using System;
 
 namespace IntegrationMocks.Modules.Postgres;
 
-public class EnvironmentPostgresService : ExternalInfrastructureService<SqlServiceContract>
+public sealed class EnvironmentPostgresService : ExternalInfrastructureService<PostgresServiceContract>
 {
-    public EnvironmentPostgresService() : base(CreateContract())
+    public EnvironmentPostgresService() : this(new PostgresEnvironmentVariables())
     {
     }
 
-    private static SqlServiceContract CreateContract()
+    public EnvironmentPostgresService(PostgresEnvironmentVariables variables) : base(new PostgresServiceContract
     {
-        return new SqlServiceContract(
-            username: Environment.GetEnvironmentVariable("SqlServiceContract_Username")
-                ?? "postgres",
-            password: Environment.GetEnvironmentVariable("SqlServiceContract_Password")
-                ?? "postgres",
-            host: Environment.GetEnvironmentVariable("SqlServiceContract_Host")
-                ?? "localhost",
-            port: int.Parse(Environment.GetEnvironmentVariable("SqlServiceContract_Port")
-                ?? "5432"));
+        Username = variables.Username.GetValue(),
+        Password = variables.Password.GetValue(),
+        Host = variables.Host.GetValue(),
+        Port = int.Parse(variables.Port.GetValue())
+    })
+    {
     }
 }

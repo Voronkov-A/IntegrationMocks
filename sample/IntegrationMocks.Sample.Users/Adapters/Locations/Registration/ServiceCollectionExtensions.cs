@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Locations.Registration;
 
-public static class ServiceCollectionExtensions
+internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddLocations(
         this IServiceCollection services,

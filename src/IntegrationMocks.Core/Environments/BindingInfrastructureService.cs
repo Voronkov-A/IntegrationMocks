@@ -6,28 +6,15 @@ namespace IntegrationMocks.Core.Environments;
 
 public class BindingInfrastructureService<TContract> : DecoratingInfrastructureService<TContract>
 {
-    public BindingInfrastructureService(
-        string environmentVariableName,
-        params ServiceBinding<TContract>[] bindings)
-        : base(CreateInner(environmentVariableName, bindings))
-    {
-    }
-
-    public BindingInfrastructureService(params ServiceBinding<TContract>[] bindings)
-        : base(CreateInner("ASPNETCORE_ENVIRONMENT", bindings))
+    public BindingInfrastructureService(params IServiceBinding<TContract>[] bindings) : base(CreateInner(bindings))
     {
     }
 
     private static IInfrastructureService<TContract> CreateInner(
-        string environmentVariableName,
-        IReadOnlyCollection<ServiceBinding<TContract>> bindings)
+        IReadOnlyCollection<IServiceBinding<TContract>> bindings)
     {
-        var environmentName = Environment.GetEnvironmentVariable(environmentVariableName);
-        var binding = bindings.LastOrDefault(x => x.EnvironmentName == environmentName)
-                      ?? bindings.LastOrDefault(x => x.EnvironmentName == null);
-        return binding == null
-            ? throw new InvalidOperationException(
-                $"Could not find binding for environment '{environmentName ?? ""}'.")
-            : binding.Factory();
+        var service = bindings.Select(x => x.GetOrDefault()).FirstOrDefault(x => x != null);
+        return service
+               ?? throw new InvalidOperationException($"All the bindings have failed for service {typeof(TContract)}.");
     }
 }

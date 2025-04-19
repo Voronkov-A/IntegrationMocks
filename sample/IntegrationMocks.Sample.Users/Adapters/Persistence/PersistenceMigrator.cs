@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Users.Adapters.Persistence;
 
-public class PersistenceMigrator : IHostedService
+internal sealed class PersistenceMigrator : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationMocks.Sample.Locations.Adapters.WebApi.Queries;
 
-public class GetLocationQueryHandler : IRequestHandler<GetLocationQuery, LocationView?>
+internal sealed class GetLocationQueryHandler : IRequestHandler<GetLocationQuery, LocationView?>
 {
     private readonly ILocationRepository _repository;
 

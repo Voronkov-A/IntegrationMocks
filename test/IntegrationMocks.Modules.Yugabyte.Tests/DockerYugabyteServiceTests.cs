@@ -13,7 +13,7 @@ using Xunit;
 
 namespace IntegrationMocks.Modules.Yugabyte.Tests;
 
-public class DockerYugabyteServiceTests
+public sealed class DockerYugabyteServiceTests
 {
     private readonly IPortManager _portManager;
     private readonly INameGenerator _nameGenerator;
@@ -21,49 +21,35 @@ public class DockerYugabyteServiceTests
 
     public DockerYugabyteServiceTests()
     {
-        var fixture = new Fixture();
         _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _nameGenerator = new RandomNameGenerator(nameof(DockerYugabyteServiceTests));
-        _options = fixture.Build<DockerYugabyteServiceOptions>().Without(x => x.Image).Create();
+        _options = new DockerYugabyteServiceOptions();
     }
 
     [Fact]
     public async Task Constructor_fills_contract_correctly()
     {
-        await using var sut = new DockerYugabyteService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerYugabyteService(_nameGenerator, _portManager, _options);
 
         Assert.Equal("localhost", sut.Contract.Host);
         Assert.True(sut.Contract.Port > 0);
+        Assert.Equal("yugabyte", sut.Contract.Username);
+        Assert.Equal("yugabyte", sut.Contract.Password);
     }
 
     [Fact]
-    public async Task Constructor_does_not_start_yugabyte()
+    public async Task Constructor_does_not_start_service()
     {
-        await using var sut = new DockerYugabyteService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerYugabyteService(_nameGenerator, _portManager, _options);
 
         var ping = await Ping(sut.CreateYugabyteConnectionString());
         Assert.False(ping);
     }
 
     [Fact]
-    public async Task InitializeAsync_makes_yugabyte_available()
+    public async Task InitializeAsync_makes_service_available()
     {
-        await using var sut = new DockerYugabyteService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerYugabyteService(_nameGenerator, _portManager, _options);
 
         await sut.InitializeAsync();
 
@@ -74,12 +60,7 @@ public class DockerYugabyteServiceTests
     [Fact]
     public async Task InitializeAsync_is_idempotent()
     {
-        await using var sut = new DockerYugabyteService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerYugabyteService(_nameGenerator, _portManager, _options);
 
         await sut.InitializeAsync();
         var firstPort = sut.Contract.Port;
@@ -92,16 +73,17 @@ public class DockerYugabyteServiceTests
     }
 
     [Fact]
-    public async Task DisposeAsync_makes_yugabyte_unavailable()
+    public async Task DisposeAsync_makes_service_unavailable()
     {
         await using var sut = new DockerYugabyteService(
-            portManager: _portManager,
-            nameGenerator: new RandomNameGenerator(nameof(DockerYugabyteServiceTests)),
-            portRange: new Range<int>(
-                UniquePorts.DockerYugabyteServiceTests,
-                UniquePorts.DockerYugabyteServiceTests),
-            options: _options,
-            attachOutput: false);
+            new RandomNameGenerator(nameof(DockerYugabyteServiceTests)),
+            _portManager,
+            new DockerYugabyteServiceOptions
+            {
+                PortRange = new Range<int>(
+                    UniquePorts.DockerYugabyteServiceTests,
+                    UniquePorts.DockerYugabyteServiceTests)
+            });
         await sut.InitializeAsync();
 
         await sut.DisposeAsync();

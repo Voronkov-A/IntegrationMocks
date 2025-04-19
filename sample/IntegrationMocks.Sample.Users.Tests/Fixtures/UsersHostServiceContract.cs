@@ -1,11 +1,8 @@
+using System;
+
 namespace IntegrationMocks.Sample.Users.Tests.Fixtures;
 
-public class UsersHostServiceContract
+internal sealed class UsersHostServiceContract
 {
-    public UsersHostServiceContract(int webApiPort)
-    {
-        WebApiPort = webApiPort;
-    }
-
-    public int WebApiPort { get; }
+    public required Uri WebApiUrl { get; init; }
 }

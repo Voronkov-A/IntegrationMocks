@@ -12,7 +12,7 @@ using Xunit;
 
 namespace IntegrationMocks.Modules.Postgres.Tests;
 
-public class DockerPostgresServiceTests
+public sealed class DockerPostgresServiceTests
 {
     private readonly IPortManager _portManager;
     private readonly INameGenerator _nameGenerator;
@@ -23,18 +23,17 @@ public class DockerPostgresServiceTests
         var fixture = new Fixture();
         _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _nameGenerator = new RandomNameGenerator(nameof(DockerPostgresServiceTests));
-        _options = fixture.Build<DockerPostgresServiceOptions>().Without(x => x.Image).Create();
+        _options = new DockerPostgresServiceOptions
+        {
+            Username = fixture.Create<string>(),
+            Password = fixture.Create<string>()
+        };
     }
 
     [Fact]
     public async Task Constructor_fills_contract_correctly()
     {
-        await using var sut = new DockerPostgresService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerPostgresService(_nameGenerator, _portManager, _options);
 
         Assert.Equal("localhost", sut.Contract.Host);
         Assert.True(sut.Contract.Port > 0);
@@ -43,28 +42,18 @@ public class DockerPostgresServiceTests
     }
 
     [Fact]
-    public async Task Constructor_does_not_start_postgres()
+    public async Task Constructor_does_not_start_service()
     {
-        await using var sut = new DockerPostgresService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerPostgresService(_nameGenerator, _portManager, _options);
 
         var ping = await Ping(sut.CreatePostgresConnectionString());
         Assert.False(ping);
     }
 
     [Fact]
-    public async Task InitializeAsync_makes_postgres_available()
+    public async Task InitializeAsync_makes_service_available()
     {
-        await using var sut = new DockerPostgresService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerPostgresService(_nameGenerator, _portManager, _options);
 
         await sut.InitializeAsync();
 
@@ -75,12 +64,7 @@ public class DockerPostgresServiceTests
     [Fact]
     public async Task InitializeAsync_is_idempotent()
     {
-        await using var sut = new DockerPostgresService(
-            _nameGenerator,
-            _portManager,
-            PortRange.Default,
-            _options,
-            attachOutput: false);
+        await using var sut = new DockerPostgresService(_nameGenerator, _portManager, _options);
 
         await sut.InitializeAsync();
         var firstPort = sut.Contract.Port;
@@ -93,16 +77,17 @@ public class DockerPostgresServiceTests
     }
 
     [Fact]
-    public async Task DisposeAsync_makes_postgres_unavailable()
+    public async Task DisposeAsync_makes_service_unavailable()
     {
         await using var sut = new DockerPostgresService(
-            portManager: _portManager,
-            nameGenerator: new RandomNameGenerator(nameof(DockerPostgresServiceTests)),
-            portRange: new Range<int>(
-                UniquePorts.DockerPostgresServiceTests,
-                UniquePorts.DockerPostgresServiceTests),
-            options: _options,
-            attachOutput: false);
+            new RandomNameGenerator(nameof(DockerPostgresServiceTests)),
+            _portManager,
+            new DockerPostgresServiceOptions
+            {
+                PortRange = new Range<int>(
+                    UniquePorts.DockerPostgresServiceTests,
+                    UniquePorts.DockerPostgresServiceTests)
+            });
         await sut.InitializeAsync();
 
         await sut.DisposeAsync();

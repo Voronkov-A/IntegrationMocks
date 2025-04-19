@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IntegrationMocks.Sample.Locations.Adapters.Persistence.Configurations;
 
-public class LocationConfiguration : IEntityTypeConfiguration<Location>
+internal sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
 {
     public void Configure(EntityTypeBuilder<Location> builder)
     {

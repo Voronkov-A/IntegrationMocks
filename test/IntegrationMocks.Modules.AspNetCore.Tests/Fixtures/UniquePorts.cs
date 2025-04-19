@@ -1,6 +1,6 @@
 namespace IntegrationMocks.Modules.AspNetCore.Tests.Fixtures;
 
-public static class UniquePorts
+internal static class UniquePorts
 {
     public const int HostServiceTests = 34200;
 

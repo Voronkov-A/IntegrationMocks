@@ -2,7 +2,7 @@ using System;
 
 namespace IntegrationMocks.Sample.Users.Domain;
 
-public readonly struct Location : IEquatable<Location>
+internal readonly struct Location : IEquatable<Location>
 {
     internal Location(Guid id)
     {

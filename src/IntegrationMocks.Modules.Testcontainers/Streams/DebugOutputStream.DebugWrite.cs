@@ -2,7 +2,7 @@
 
 namespace IntegrationMocks.Modules.Testcontainers.Streams;
 
-internal partial class DebugOutputStream
+internal sealed partial class DebugOutputStream
 {
     private static void DebugWrite(string message)
     {
