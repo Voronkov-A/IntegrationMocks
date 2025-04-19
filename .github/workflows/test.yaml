@@ -9,7 +9,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '8.0.x'
       - name: Test
         run: dotnet test --logger trx --results-directory test-results
       - name: Upload test results
