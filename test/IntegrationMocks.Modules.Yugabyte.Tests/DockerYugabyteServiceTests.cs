@@ -6,6 +6,7 @@ using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.Yugabyte.Tests.Fixtures;
 using Npgsql;
 using System;
+using System.Data.Common;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -15,12 +16,14 @@ namespace IntegrationMocks.Modules.Yugabyte.Tests;
 
 public sealed class DockerYugabyteServiceTests
 {
+    private readonly IFixture _fixture;
     private readonly IPortManager _portManager;
     private readonly INameGenerator _nameGenerator;
     private readonly DockerYugabyteServiceOptions _options;
 
     public DockerYugabyteServiceTests()
     {
+        _fixture = new Fixture();
         _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _nameGenerator = new RandomNameGenerator(nameof(DockerYugabyteServiceTests));
         _options = new DockerYugabyteServiceOptions();
@@ -90,6 +93,33 @@ public sealed class DockerYugabyteServiceTests
 
         var ping = await Ping(sut.CreateYugabyteConnectionString());
         Assert.False(ping);
+    }
+
+    [Fact]
+    public async Task Can_create_table()
+    {
+        await using var sut = new DockerYugabyteService(_nameGenerator, _portManager, _options);
+        await sut.InitializeAsync();
+
+        var databaseName = _fixture.Create<string>();
+
+        await using var masterConnection = new NpgsqlConnection(sut.CreateYugabyteConnectionString());
+        await masterConnection.OpenAsync();
+        await ExecuteNonQueryAsync(masterConnection, $"CREATE DATABASE \"{databaseName}\";");
+
+        await using var connection = new NpgsqlConnection(sut.CreateYugabyteConnectionString(databaseName));
+        await connection.OpenAsync();
+        await ExecuteNonQueryAsync(connection, "CREATE TABLE test (id text);");
+        var inserted = await ExecuteNonQueryAsync(connection, "INSERT INTO test (id) VALUES ('id');");
+
+        Assert.Equal(1, inserted);
+    }
+
+    private static async Task<int> ExecuteNonQueryAsync(DbConnection connection, string sql)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        return await command.ExecuteNonQueryAsync();
     }
 
     private static async Task<bool> Ping(string connectionString)

@@ -5,6 +5,7 @@ using IntegrationMocks.Core.Names;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.Postgres.Tests.Fixtures;
 using Npgsql;
+using System.Data.Common;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -14,19 +15,20 @@ namespace IntegrationMocks.Modules.Postgres.Tests;
 
 public sealed class DockerPostgresServiceTests
 {
+    private readonly IFixture _fixture;
     private readonly IPortManager _portManager;
     private readonly INameGenerator _nameGenerator;
     private readonly DockerPostgresServiceOptions _options;
 
     public DockerPostgresServiceTests()
     {
-        var fixture = new Fixture();
+        _fixture = new Fixture();
         _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _nameGenerator = new RandomNameGenerator(nameof(DockerPostgresServiceTests));
         _options = new DockerPostgresServiceOptions
         {
-            Username = fixture.Create<string>(),
-            Password = fixture.Create<string>()
+            Username = _fixture.Create<string>(),
+            Password = _fixture.Create<string>()
         };
     }
 
@@ -94,6 +96,33 @@ public sealed class DockerPostgresServiceTests
 
         var ping = await Ping(sut.CreatePostgresConnectionString());
         Assert.False(ping);
+    }
+
+    [Fact]
+    public async Task Can_create_table()
+    {
+        await using var sut = new DockerPostgresService(_nameGenerator, _portManager, _options);
+        await sut.InitializeAsync();
+
+        var databaseName = _fixture.Create<string>();
+
+        await using var masterConnection = new NpgsqlConnection(sut.CreatePostgresConnectionString());
+        await masterConnection.OpenAsync();
+        await ExecuteNonQueryAsync(masterConnection, $"CREATE DATABASE \"{databaseName}\";");
+
+        await using var connection = new NpgsqlConnection(sut.CreatePostgresConnectionString(databaseName));
+        await connection.OpenAsync();
+        await ExecuteNonQueryAsync(connection, "CREATE TABLE test (id text);");
+        var inserted = await ExecuteNonQueryAsync(connection, "INSERT INTO test (id) VALUES ('id');");
+
+        Assert.Equal(1, inserted);
+    }
+
+    private static async Task<int> ExecuteNonQueryAsync(DbConnection connection, string sql)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        return await command.ExecuteNonQueryAsync();
     }
 
     private static async Task<bool> Ping(string connectionString)

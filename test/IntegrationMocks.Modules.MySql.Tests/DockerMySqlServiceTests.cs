@@ -1,6 +1,3 @@
-using System.IO;
-using System.Net.Sockets;
-using System.Threading.Tasks;
 using AutoFixture;
 using IntegrationMocks.Core;
 using IntegrationMocks.Core.Miscellaneous;
@@ -8,24 +5,29 @@ using IntegrationMocks.Core.Names;
 using IntegrationMocks.Core.Networking;
 using IntegrationMocks.Modules.MySql.Tests.Fixtures;
 using MySql.Data.MySqlClient;
+using System.Data.Common;
+using System.IO;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationMocks.Modules.MySql.Tests;
 
 public sealed class DockerMySqlServiceTests
 {
+    private readonly IFixture _fixture;
     private readonly IPortManager _portManager;
     private readonly INameGenerator _nameGenerator;
     private readonly DockerMySqlServiceOptions _options;
 
     public DockerMySqlServiceTests()
     {
-        var fixture = new Fixture();
+        _fixture = new Fixture();
         _portManager = new PortManager(LoggerFixture.CreateLogger<PortManager>());
         _nameGenerator = new RandomNameGenerator(nameof(DockerMySqlServiceTests));
         _options = new DockerMySqlServiceOptions
         {
-            Password = fixture.Create<string>()
+            Password = _fixture.Create<string>()
         };
     }
 
@@ -93,6 +95,33 @@ public sealed class DockerMySqlServiceTests
 
         var ping = await Ping(sut.CreateMySqlConnectionString());
         Assert.False(ping);
+    }
+
+    [Fact]
+    public async Task Can_create_table()
+    {
+        await using var sut = new DockerMySqlService(_nameGenerator, _portManager, _options);
+        await sut.InitializeAsync();
+
+        var databaseName = _fixture.Create<string>();
+
+        await using var masterConnection = new MySqlConnection(sut.CreateMySqlConnectionString());
+        await masterConnection.OpenAsync();
+        await ExecuteNonQueryAsync(masterConnection, $"CREATE DATABASE `{databaseName}`;");
+
+        await using var connection = new MySqlConnection(sut.CreateMySqlConnectionString(databaseName));
+        await connection.OpenAsync();
+        await ExecuteNonQueryAsync(connection, "CREATE TABLE test (id text);");
+        var inserted = await ExecuteNonQueryAsync(connection, "INSERT INTO test (id) VALUES ('id');");
+
+        Assert.Equal(1, inserted);
+    }
+
+    private static async Task<int> ExecuteNonQueryAsync(DbConnection connection, string sql)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        return await command.ExecuteNonQueryAsync();
     }
 
     private static async Task<bool> Ping(string connectionString)

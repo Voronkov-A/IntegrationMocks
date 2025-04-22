@@ -13,6 +13,6 @@ public static class MySqlServiceExtensions
         var password = UrlEncoder.Default.Encode(service.Contract.Password);
         var host = service.Contract.Host;
         var port = service.Contract.Port;
-        return $"server={host};uid={username};pwd={password};port={port}";
+        return $"server={host};uid={username};pwd={password};port={port};database={database}";
     }
 }
